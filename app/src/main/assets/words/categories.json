@@ -1,0 +1,52 @@
+[
+  {
+    "id": "GENERAL",
+    "displayName": "GENERAL",
+    "file": "GENERAL.txt"
+  },
+  {
+    "id": "PROFESSION",
+    "displayName": "PROFESSION",
+    "file": "PROFESSION.txt"
+  },
+  {
+    "id": "ANIMAL",
+    "displayName": "ANIMAL",
+    "file": "ANIMAL.txt"
+  },
+  {
+    "id": "FRUITS",
+    "displayName": "FRUITS",
+    "file": "FRUITS.txt"
+  },
+  {
+    "id": "VEHICLES",
+    "displayName": "VEHICLES",
+    "file": "VEHICLES.txt"
+  },
+  {
+    "id": "COLORS",
+    "displayName": "COLORS",
+    "file": "COLORS.txt"
+  },
+  {
+    "id": "SPORTS",
+    "displayName": "SPORTS",
+    "file": "SPORTS.txt"
+  },
+  {
+    "id": "FLOWERS",
+    "displayName": "FLOWERS",
+    "file": "FLOWERS.txt"
+  },
+  {
+    "id": "FOODS",
+    "displayName": "FOODS",
+    "file": "FOODS.txt"
+  },
+  {
+    "id": "DRINKS",
+    "displayName": "DRINKS",
+    "file": "DRINKS.txt"
+  }
+]

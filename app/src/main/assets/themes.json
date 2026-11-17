@@ -1,0 +1,1394 @@
+[
+  {
+    "id": "DEFAULT",
+    "name": "DEFAULT",
+    "bg": "#1e1e2f",
+    "accent": "#4cafef",
+    "text": "#ffffff",
+    "price": 0
+  },
+  {
+    "id": "DARK",
+    "name": "DARK",
+    "bg": "#121212",
+    "accent": "#888888",
+    "text": "#f0f0f0",
+    "price": 120
+  },
+  {
+    "id": "CLOUD",
+    "name": "CLOUD",
+    "bg": "#F5F5F5",
+    "accent": "#D9D9D9",
+    "text": "#000000",
+    "price": 120
+  },
+  {
+    "id": "LIGHT",
+    "name": "LIGHT",
+    "bg": "#ffffff",
+    "accent": "#D4D4D4",
+    "text": "#f0f0f0",
+    "price": 120
+  },
+  {
+    "id": "SAND",
+    "name": "SAND",
+    "bg": "#F4E7C5",
+    "accent": "#E8D6A8",
+    "text": "#000000",
+    "price": 120
+  },
+  {
+    "id": "ICE",
+    "name": "ICE",
+    "bg": "#E0F7FA",
+    "accent": "#81D4FA",
+    "text": "#000000",
+    "price": 130
+  },
+  {
+    "id": "METAL",
+    "name": "METAL",
+    "bg": "#2E2E2E",
+    "accent": "#757575",
+    "text": "#FFFFFF",
+    "price": 130
+  },
+  {
+    "id": "PEACH",
+    "name": "PEACH",
+    "bg": "#FFB07C",
+    "accent": "#FF8E63",
+    "text": "#000000",
+    "price": 130
+  },
+  {
+    "id": "MINT",
+    "name": "MINT",
+    "bg": "#98FFDE",
+    "accent": "#5FF7D2",
+    "text": "#000000",
+    "price": 130
+  },
+  {
+    "id": "GREEN",
+    "name": "GREEN",
+    "bg": "#00FF00",
+    "accent": "#5CFF5F",
+    "text": "#ffffff",
+    "price": 140
+  },
+  {
+    "id": "CANDY_PINK",
+    "name": "CANDY PINK",
+    "bg": "#FF69B4",
+    "accent": "#FF85C2",
+    "text": "#FFFFFF",
+    "price": 140
+  },
+  {
+    "id": "SKY",
+    "name": "SKY",
+    "bg": "#87CEEB",
+    "accent": "#5BB9E6",
+    "text": "#FFFFFF",
+    "price": 140
+  },
+  {
+    "id": "LIME",
+    "name": "LIME",
+    "bg": "#32CD32",
+    "accent": "#7CFC00",
+    "text": "#FFFFFF",
+    "price": 140
+  },
+  {
+    "id": "AQUA",
+    "name": "AQUA",
+    "bg": "#00FFFF",
+    "accent": "#40E0D0",
+    "text": "#000000",
+    "price": 140
+  },
+  {
+    "id": "RED",
+    "name": "RED",
+    "bg": "#FF2424",
+    "accent": "#ff4d4d",
+    "text": "#ffffff",
+    "price": 150
+  },
+  {
+    "id": "PURPLE",
+    "name": "PURPLE",
+    "bg": "#9900FF",
+    "accent": "#a270ff",
+    "text": "#ffffff",
+    "price": 150
+  },
+  {
+    "id": "ORANGE",
+    "name": "ORANGE",
+    "bg": "#FFA600",
+    "accent": "#F2B530",
+    "text": "#f0f0f0",
+    "price": 150
+  },
+  {
+    "id": "CYAN",
+    "name": "CYAN",
+    "bg": "#00FFFB",
+    "accent": "#3dd6eb",
+    "text": "#ffffff",
+    "price": 150
+  },
+  {
+    "id": "OCEAN_BLUE",
+    "name": "OCEAN BLUE",
+    "bg": "#0066FF",
+    "accent": "#3399FF",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "COFFEE",
+    "name": "COFFEE",
+    "bg": "#4E342E",
+    "accent": "#795548",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "GRAPE",
+    "name": "GRAPE",
+    "bg": "#6A0DAD",
+    "accent": "#A64DFF",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "STEEL_BLUE",
+    "name": "STEEL BLUE",
+    "bg": "#4682B4",
+    "accent": "#5F9EA0",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "VIOLET",
+    "name": "VIOLET",
+    "bg": "#8F00FF",
+    "accent": "#C77DFF",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "COPPER",
+    "name": "COPPER",
+    "bg": "#B87333",
+    "accent": "#D99058",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "STORM",
+    "name": "STORM",
+    "bg": "#2C3E50",
+    "accent": "#34495E",
+    "text": "#FFFFFF",
+    "price": 150
+  },
+  {
+    "id": "YELLOW",
+    "name": "YELLOW",
+    "bg": "#FFFF00",
+    "accent": "#ffde59",
+    "text": "#ffffff",
+    "price": 160
+  },
+  {
+    "id": "SKY_BLUE",
+    "name": "SKY BLUE",
+    "bg": "#00F7FF",
+    "accent": "#00AAFF",
+    "text": "#f0f0f0",
+    "price": 160
+  },
+  {
+    "id": "SUNSET",
+    "name": "SUNSET",
+    "bg": "#FF5733",
+    "accent": "#FFC300",
+    "text": "#FFFFFF",
+    "price": 160
+  },
+  {
+    "id": "VIVID_BLUE",
+    "name": "VIVID BLUE",
+    "bg": "#007BFF",
+    "accent": "#339CFF",
+    "text": "#ffffff",
+    "price": 170
+  },
+  {
+    "id": "VIVID_GREEN",
+    "name": "VIVID GREEN",
+    "bg": "#00C853",
+    "accent": "#5CFF85",
+    "text": "#ffffff",
+    "price": 170
+  },
+  {
+    "id": "VIVID_RED",
+    "name": "VIVID RED",
+    "bg": "#FF1744",
+    "accent": "#FF5252",
+    "text": "#ffffff",
+    "price": 170
+  },
+  {
+    "id": "ROSE_RED",
+    "name": "ROSE RED",
+    "bg": "#FF0048",
+    "accent": "#FF5C8D",
+    "text": "#FFFFFF",
+    "price": 170
+  },
+  {
+    "id": "VIVID_ORANGE",
+    "name": "VIVID ORANGE",
+    "bg": "#FF9100",
+    "accent": "#FFB74D",
+    "text": "#ffffff",
+    "price": 180
+  },
+  {
+    "id": "VIVID_YELLOW",
+    "name": "VIVID YELLOW",
+    "bg": "#FFEA00",
+    "accent": "#FFFF33",
+    "text": "#000000",
+    "price": 180
+  },
+  {
+    "id": "NEON_GREEN",
+    "name": "NEON GREEN",
+    "bg": "#00FF00",
+    "accent": "#39FF14",
+    "text": "#000000",
+    "price": 180
+  },
+  {
+    "id": "FIRE",
+    "name": "FIRE",
+    "bg": "#FF4500",
+    "accent": "#FF7F24",
+    "text": "#FFFFFF",
+    "price": 180
+  },
+  {
+    "id": "BLOOD_RED",
+    "name": "BLOOD RED",
+    "bg": "#8A0303",
+    "accent": "#CC0000",
+    "text": "#FFFFFF",
+    "price": 180
+  },
+  {
+    "id": "TOXIC",
+    "name": "TOXIC",
+    "bg": "#B8FF00",
+    "accent": "#D4FF4A",
+    "text": "#000000",
+    "price": 180
+  },
+  {
+    "id": "FOREST",
+    "name": "FOREST",
+    "bg": "#054A29",
+    "accent": "#0FA85F",
+    "text": "#FFFFFF",
+    "price": 180
+  },
+  {
+    "id": "MIDNIGHT",
+    "name": "MIDNIGHT",
+    "bg": "#0A0A0A",
+    "accent": "#1F1F1F",
+    "text": "#FFFFFF",
+    "price": 180
+  },
+  {
+    "id": "VIVID_PURPLE",
+    "name": "VIVID PURPLE",
+    "bg": "#AA00FF",
+    "accent": "#C266FF",
+    "text": "#ffffff",
+    "price": 190
+  },
+  {
+    "id": "VIVID_PINK",
+    "name": "VIVID PINK",
+    "bg": "#FF4081",
+    "accent": "#FF80AB",
+    "text": "#ffffff",
+    "price": 190
+  },
+  {
+    "id": "VIVID_CYAN",
+    "name": "VIVID CYAN",
+    "bg": "#00E5FF",
+    "accent": "#33FFFF",
+    "text": "#000000",
+    "price": 200
+  },
+  {
+    "id": "VIVID_LIME",
+    "name": "VIVID LIME",
+    "bg": "#AEEA00",
+    "accent": "#CDFF33",
+    "text": "#000000",
+    "price": 200
+  },
+  {
+    "id": "AURORA",
+    "name": "AURORA",
+    "bg": "#3A0CA3",
+    "accent": "#7209B7",
+    "text": "#FFFFFF",
+    "price": 200
+  },
+  {
+    "id": "DARK_EMERALD",
+    "name": "DARK EMERALD",
+    "bg": "#003B2A",
+    "accent": "#007F5F",
+    "text": "#FFFFFF",
+    "price": 200
+  },
+  {
+    "id": "VIVID_TEAL",
+    "name": "VIVID TEAL",
+    "bg": "#00BFA5",
+    "accent": "#40E0D0",
+    "text": "#ffffff",
+    "price": 210
+  },
+  {
+    "id": "VIVID_SKY",
+    "name": "VIVID SKY",
+    "bg": "#00C4FF",
+    "accent": "#33D4FF",
+    "text": "#ffffff",
+    "price": 210
+  },
+  {
+    "id": "VIVID_MAGENTA",
+    "name": "VIVID MAGENTA",
+    "bg": "#E040FB",
+    "accent": "#EA80FC",
+    "text": "#ffffff",
+    "price": 220
+  },
+  {
+    "id": "VIVID_GOLD",
+    "name": "VIVID GOLD",
+    "bg": "#FFB300",
+    "accent": "#FFD54F",
+    "text": "#000000",
+    "price": 220
+  },
+  {
+    "id": "SPACE",
+    "name": "SPACE",
+    "bg": "#1B0036",
+    "accent": "#4B0082",
+    "text": "#FFFFFF",
+    "price": 220
+  },
+  {
+    "id": "CYBER",
+    "name": "CYBER",
+    "bg": "#020F24",
+    "accent": "#00E5FF",
+    "text": "#FFFFFF",
+    "price": 220
+  },
+  {
+    "id": "VIVID_AQUA",
+    "name": "VIVID AQUA",
+    "bg": "#00FFFF",
+    "accent": "#66FFFF",
+    "text": "#000000",
+    "price": 230
+  },
+  {
+    "id": "GOLD",
+    "name": "GOLD",
+    "bg": "#FFD700",
+    "accent": "#FFEA70",
+    "text": "#000000",
+    "price": 230
+  },
+  {
+    "id": "ARCTIC",
+    "name": "ARCTIC",
+    "bg": "#A8EFFF",
+    "accent": "#74D4FF",
+    "text": "#000000",
+    "price": 240
+  },
+  {
+    "id": "TROPICAL",
+    "name": "TROPICAL",
+    "bg": "#00D1A0",
+    "accent": "#4FFFD3",
+    "text": "#000000",
+    "price": 240
+  },
+  {
+    "id": "DESERT",
+    "name": "DESERT",
+    "bg": "#EDC9AF",
+    "accent": "#E3B98E",
+    "text": "#000000",
+    "price": 240
+  },
+  {
+    "id": "JUNGLE",
+    "name": "JUNGLE",
+    "bg": "#1B5E20",
+    "accent": "#4CAF50",
+    "text": "#FFFFFF",
+    "price": 250
+  },
+  {
+    "id": "MIDNIGHT_BLUE",
+    "name": "MIDNIGHT BLUE",
+    "bg": "#001F3F",
+    "accent": "#003F7F",
+    "text": "#FFFFFF",
+    "price": 250
+  },
+  {
+    "id": "CHARCOAL",
+    "name": "CHARCOAL",
+    "bg": "#222222",
+    "accent": "#555555",
+    "text": "#FFFFFF",
+    "price": 250
+  },
+  {
+    "id": "TEA_GREEN",
+    "name": "TEA GREEN",
+    "bg": "#D0F0C0",
+    "accent": "#A6D99B",
+    "text": "#000000",
+    "price": 260
+  },
+  {
+    "id": "SEAFOAM",
+    "name": "SEAFOAM",
+    "bg": "#9FFFE0",
+    "accent": "#5FFFD4",
+    "text": "#000000",
+    "price": 260
+  },
+  {
+    "id": "CORAL",
+    "name": "CORAL",
+    "bg": "#FF7F50",
+    "accent": "#FFA78A",
+    "text": "#000000",
+    "price": 260
+  },
+  {
+    "id": "PLUM",
+    "name": "PLUM",
+    "bg": "#8E4585",
+    "accent": "#C774C5",
+    "text": "#FFFFFF",
+    "price": 270
+  },
+  {
+    "id": "EMERALD",
+    "name": "EMERALD",
+    "bg": "#008F39",
+    "accent": "#00C45A",
+    "text": "#FFFFFF",
+    "price": 270
+  },
+  {
+    "id": "SAPPHIRE",
+    "name": "SAPPHIRE",
+    "bg": "#08457E",
+    "accent": "#0F6ABD",
+    "text": "#FFFFFF",
+    "price": 270
+  },
+  {
+    "id": "RUBY",
+    "name": "RUBY",
+    "bg": "#9B111E",
+    "accent": "#D7263D",
+    "text": "#FFFFFF",
+    "price": 280
+  },
+  {
+    "id": "AMETHYST",
+    "name": "AMETHYST",
+    "bg": "#9966CC",
+    "accent": "#B689FF",
+    "text": "#FFFFFF",
+    "price": 280
+  },
+  {
+    "id": "ONYX",
+    "name": "ONYX",
+    "bg": "#353839",
+    "accent": "#5A5D5E",
+    "text": "#FFFFFF",
+    "price": 280
+  },
+  {
+    "id": "MANGO",
+    "name": "MANGO",
+    "bg": "#FFCC4D",
+    "accent": "#FFA90A",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "GUM",
+    "name": "GUM",
+    "bg": "#FFB3DA",
+    "accent": "#FF7BC3",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "GHOST_MINT",
+    "name": "GHOST MINT",
+    "bg": "#E9FFF9",
+    "accent": "#C4FDEB",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "BREEZE",
+    "name": "BREEZE",
+    "bg": "#F2FAFF",
+    "accent": "#D2ECFF",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "OCEAN_GLASS",
+    "name": "OCEAN GLASS",
+    "bg": "#D6F4FF",
+    "accent": "#A2E6FF",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "PEARL",
+    "name": "PEARL",
+    "bg": "#F2F1EF",
+    "accent": "#DCD9D4",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "MOONGREY",
+    "name": "MOONGREY",
+    "bg": "#F1F1F5",
+    "accent": "#C7C7D3",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "CRYMINT",
+    "name": "CRYMINT",
+    "bg": "#C8FFE3",
+    "accent": "#7FFFD4",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "SEASHELL",
+    "name": "SEASHELL",
+    "bg": "#FFE6DF",
+    "accent": "#FFC8BC",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "MINT_2",
+    "name": "MINT",
+    "bg": "#D9FFF8",
+    "accent": "#A5EDE1",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "GUMDROP",
+    "name": "GUMDROP",
+    "bg": "#C3FFB4",
+    "accent": "#7AE582",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "POWDER",
+    "name": "POWDER",
+    "bg": "#DAEFFF",
+    "accent": "#A8D8FF",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "ICEBERG",
+    "name": "ICEBERG",
+    "bg": "#F8FFFF",
+    "accent": "#D7F2FF",
+    "text": "#000000",
+    "price": 280
+  },
+  {
+    "id": "DUCK",
+    "name": "DUCK",
+    "bg": "#FFEB3B",
+    "accent": "#FFC400",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "AUROSE",
+    "name": "AUROSE",
+    "bg": "#FFDBEC",
+    "accent": "#FF9BCB",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "CPEACH",
+    "name": "CPEACH",
+    "bg": "#FFD1BD",
+    "accent": "#FF9F80",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "IVORY",
+    "name": "IVORY",
+    "bg": "#FFFFF0",
+    "accent": "#ECE6C8",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "FROSTBITE",
+    "name": "FROSTBITE",
+    "bg": "#D8F6FF",
+    "accent": "#90D9FF",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "PEARL_2",
+    "name": "PEARL",
+    "bg": "#FFF0F6",
+    "accent": "#FFC7DE",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "SILVER",
+    "name": "SILVER",
+    "bg": "#C0C0C0",
+    "accent": "#D9D9D9",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "PIXEL",
+    "name": "PIXEL",
+    "bg": "#003300",
+    "accent": "#00CC00",
+    "text": "#FFFFFF",
+    "price": 290
+  },
+  {
+    "id": "SOFT_GOLD",
+    "name": "SOFT GOLD",
+    "bg": "#FFF7D1",
+    "accent": "#FFE07E",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "TURQ",
+    "name": "TURQ",
+    "bg": "#C7FFF8",
+    "accent": "#74F2CE",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "LILAC",
+    "name": "LILAC",
+    "bg": "#EFE1FF",
+    "accent": "#D6B8FF",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "LEMON",
+    "name": "LEMON",
+    "bg": "#F7FF9D",
+    "accent": "#E5FF57",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "GLACIAL",
+    "name": "GLACIAL",
+    "bg": "#CFEFFF",
+    "accent": "#9FD6FF",
+    "text": "#000000",
+    "price": 290
+  },
+  {
+    "id": "LAVENDER",
+    "name": "LAVENDER",
+    "bg": "#E6E6FA",
+    "accent": "#BFA2DB",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "STARDUST",
+    "name": "STARDUST",
+    "bg": "#FFFFFF",
+    "accent": "#EDEDED",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "PLATINUM",
+    "name": "PLATINUM",
+    "bg": "#E0E0E0",
+    "accent": "#B5B5B5",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "HAZE_PURPLE",
+    "name": "HAZE PURPLE",
+    "bg": "#C7B4E3",
+    "accent": "#A48CC7",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "BLUEBERRY_ICE",
+    "name": "BLUEBERRY ICE",
+    "bg": "#E3E6FF",
+    "accent": "#AAB3FF",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "BRONZE",
+    "name": "BRONZE",
+    "bg": "#CD7F32",
+    "accent": "#E5A05D",
+    "text": "#FFFFFF",
+    "price": 300
+  },
+  {
+    "id": "LUNARPEARL",
+    "name": "LUNARPEARL",
+    "bg": "#F3F4F6",
+    "accent": "#D9DCE1",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "BRICK_RED",
+    "name": "BRICK RED",
+    "bg": "#8C1C13",
+    "accent": "#BF3B30",
+    "text": "#FFFFFF",
+    "price": 300
+  },
+  {
+    "id": "OLIVE",
+    "name": "OLIVE",
+    "bg": "#556B2F",
+    "accent": "#7A8F3A",
+    "text": "#FFFFFF",
+    "price": 300
+  },
+  {
+    "id": "SAKURA",
+    "name": "SAKURA",
+    "bg": "#F9D5E5",
+    "accent": "#F28DB2",
+    "text": "#000000",
+    "price": 300
+  },
+  {
+    "id": "NAVY",
+    "name": "NAVY",
+    "bg": "#001833",
+    "accent": "#003366",
+    "text": "#FFFFFF",
+    "price": 310
+  },
+  {
+    "id": "FOREST_MOSS",
+    "name": "FOREST MOSS",
+    "bg": "#3A4F2D",
+    "accent": "#557A44",
+    "text": "#FFFFFF",
+    "price": 310
+  },
+  {
+    "id": "GRAFMIST",
+    "name": "GRAFMIST",
+    "bg": "#3C3F45",
+    "accent": "#6B6E75",
+    "text": "#FFFFFF",
+    "price": 310
+  },
+  {
+    "id": "ASH_GREY",
+    "name": "ASH GREY",
+    "bg": "#B2BEB5",
+    "accent": "#CED5D0",
+    "text": "#000000",
+    "price": 310
+  },
+  {
+    "id": "STEEL_GREY",
+    "name": "STEEL GREY",
+    "bg": "#71797E",
+    "accent": "#9EA4A8",
+    "text": "#FFFFFF",
+    "price": 310
+  },
+  {
+    "id": "PINKMETAL",
+    "name": "PINKMETAL",
+    "bg": "#FFD0E8",
+    "accent": "#FF8DCB",
+    "text": "#000000",
+    "price": 310
+  },
+  {
+    "id": "ORBITGRAY",
+    "name": "ORBITGRAY",
+    "bg": "#2D2F36",
+    "accent": "#5A5D65",
+    "text": "#FFFFFF",
+    "price": 310
+  },
+  {
+    "id": "COBALT",
+    "name": "COBALT",
+    "bg": "#0047AB",
+    "accent": "#3A74D6",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "SANDSTONE",
+    "name": "SANDSTONE",
+    "bg": "#D8B47A",
+    "accent": "#F1CE96",
+    "text": "#000000",
+    "price": 320
+  },
+  {
+    "id": "NIGHT_SKY",
+    "name": "NIGHT SKY",
+    "bg": "#00111F",
+    "accent": "#003355",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "TWILIGHTSEA",
+    "name": "TWILIGHTSEA",
+    "bg": "#013A4A",
+    "accent": "#02788B",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "TEAL_BLUE",
+    "name": "TEAL BLUE",
+    "bg": "#008080",
+    "accent": "#33A3A3",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "CARAMEL",
+    "name": "CARAMEL",
+    "bg": "#8C6338",
+    "accent": "#D0A373",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "MIDCYAN",
+    "name": "MIDCYAN",
+    "bg": "#00252E",
+    "accent": "#00A7B3",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "FERN",
+    "name": "FERN",
+    "bg": "#1B3B1A",
+    "accent": "#447A44",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "TANGERINE",
+    "name": "TANGERINE",
+    "bg": "#FF8A3D",
+    "accent": "#FF6A00",
+    "text": "#000000",
+    "price": 320
+  },
+  {
+    "id": "SUN",
+    "name": "SUN",
+    "bg": "#FFEC66",
+    "accent": "#FFD23F",
+    "text": "#000000",
+    "price": 320
+  },
+  {
+    "id": "AQUA_STEEL",
+    "name": "AQUA STEEL",
+    "bg": "#1C2E3A",
+    "accent": "#4DB6AC",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "VINTAGE_BLUE",
+    "name": "VINTAGE BLUE",
+    "bg": "#A2CFFE",
+    "accent": "#78B5FF",
+    "text": "#000000",
+    "price": 320
+  },
+  {
+    "id": "GRAPHITE",
+    "name": "GRAPHITE",
+    "bg": "#111113",
+    "accent": "#292A2E",
+    "text": "#FFFFFF",
+    "price": 320
+  },
+  {
+    "id": "SUNRISE",
+    "name": "SUNRISE",
+    "bg": "#FFB347",
+    "accent": "#FFD27F",
+    "text": "#000000",
+    "price": 330
+  },
+  {
+    "id": "DUSK",
+    "name": "DUSK",
+    "bg": "#4B3F72",
+    "accent": "#7F6DA0",
+    "text": "#FFFFFF",
+    "price": 330
+  },
+  {
+    "id": "DAWN",
+    "name": "DAWN",
+    "bg": "#FFE4C4",
+    "accent": "#FFD2A1",
+    "text": "#000000",
+    "price": 330
+  },
+  {
+    "id": "ARC_SHADOW",
+    "name": "ARC SHADOW",
+    "bg": "#0E1E2E",
+    "accent": "#2F4C6E",
+    "text": "#FFFFFF",
+    "price": 330
+  },
+  {
+    "id": "HONEY",
+    "name": "HONEY",
+    "bg": "#FFC30B",
+    "accent": "#FFD95A",
+    "text": "#000000",
+    "price": 340
+  },
+  {
+    "id": "FIREBRICK",
+    "name": "FIREBRICK",
+    "bg": "#B22222",
+    "accent": "#D44747",
+    "text": "#FFFFFF",
+    "price": 340
+  },
+  {
+    "id": "SUNCORE",
+    "name": "SUNCORE",
+    "bg": "#FF6A00",
+    "accent": "#FFC72C",
+    "text": "#000000",
+    "price": 340
+  },
+  {
+    "id": "MOCHA",
+    "name": "MOCHA",
+    "bg": "#3C2F2F",
+    "accent": "#6F4E37",
+    "text": "#FFFFFF",
+    "price": 340
+  },
+  {
+    "id": "MIDNIGHT_GREEN",
+    "name": "MIDNIGHT GREEN",
+    "bg": "#004953",
+    "accent": "#006F75",
+    "text": "#FFFFFF",
+    "price": 350
+  },
+  {
+    "id": "OLYMPIC_BLUE",
+    "name": "OLYMPIC BLUE",
+    "bg": "#0080FF",
+    "accent": "#4DA6FF",
+    "text": "#FFFFFF",
+    "price": 350
+  },
+  {
+    "id": "DARKWOOD",
+    "name": "DARKWOOD",
+    "bg": "#0D1F0A",
+    "accent": "#395723",
+    "text": "#FFFFFF",
+    "price": 350
+  },
+  {
+    "id": "TIDAL",
+    "name": "TIDAL",
+    "bg": "#0A4F41",
+    "accent": "#1AA57C",
+    "text": "#FFFFFF",
+    "price": 350
+  },
+  {
+    "id": "VELVET_PURPLE",
+    "name": "VELVET PURPLE",
+    "bg": "#800080",
+    "accent": "#B266B2",
+    "text": "#FFFFFF",
+    "price": 350
+  },
+  {
+    "id": "SUNPURPLE",
+    "name": "SUNPURPLE",
+    "bg": "#3D0066",
+    "accent": "#A64DFF",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "EMBER",
+    "name": "EMBER",
+    "bg": "#330000",
+    "accent": "#FF3D00",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "CHERRY",
+    "name": "CHERRY",
+    "bg": "#990012",
+    "accent": "#FF3355",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "INDISHADOW",
+    "name": "INDISHADOW",
+    "bg": "#140A33",
+    "accent": "#2C1A69",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "CRIMSON",
+    "name": "CRIMSON",
+    "bg": "#4B0000",
+    "accent": "#D10000",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "GOLDENROD",
+    "name": "GOLDENROD",
+    "bg": "#DAA520",
+    "accent": "#F4C542",
+    "text": "#000000",
+    "price": 360
+  },
+  {
+    "id": "VIOLEDGE",
+    "name": "VIOLEDGE",
+    "bg": "#5A00A1",
+    "accent": "#B400FF",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "RASPBERRY",
+    "name": "RASPBERRY",
+    "bg": "#B0005A",
+    "accent": "#FF1D8E",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "EMERALD_SEA",
+    "name": "EMERALD SEA",
+    "bg": "#002F2F",
+    "accent": "#007F7F",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "TEAL",
+    "name": "TEAL",
+    "bg": "#002B36",
+    "accent": "#2AA198",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "SAPPSHADOW",
+    "name": "SAPPSHADOW",
+    "bg": "#001B40",
+    "accent": "#003C8F",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "BLUEBERRY",
+    "name": "BLUEBERRY",
+    "bg": "#2E236C",
+    "accent": "#4F3EBF",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "CHAMPAGNE",
+    "name": "CHAMPAGNE",
+    "bg": "#F7E7CE",
+    "accent": "#F2D7B5",
+    "text": "#000000",
+    "price": 360
+  },
+  {
+    "id": "OCEAN",
+    "name": "OCEAN",
+    "bg": "#012E40",
+    "accent": "#026773",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "ARCTIC_2",
+    "name": "ARCTIC",
+    "bg": "#001F29",
+    "accent": "#005F73",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "BURGUNDY",
+    "name": "BURGUNDY",
+    "bg": "#800020",
+    "accent": "#A63343",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "CYBERBERRY",
+    "name": "CYBERBERRY",
+    "bg": "#31002F",
+    "accent": "#D100BA",
+    "text": "#FFFFFF",
+    "price": 360
+  },
+  {
+    "id": "MAROON",
+    "name": "MAROON",
+    "bg": "#800000",
+    "accent": "#B03030",
+    "text": "#FFFFFF",
+    "price": 370
+  },
+  {
+    "id": "WINE",
+    "name": "WINE",
+    "bg": "#722F37",
+    "accent": "#A04552",
+    "text": "#FFFFFF",
+    "price": 370
+  },
+  {
+    "id": "LILAC_2",
+    "name": "LILAC",
+    "bg": "#C8A2C8",
+    "accent": "#E1C4E1",
+    "text": "#000000",
+    "price": 370
+  },
+  {
+    "id": "PEACH_FIZZ",
+    "name": "PEACH FIZZ",
+    "bg": "#FFCCB3",
+    "accent": "#FFB199",
+    "text": "#000000",
+    "price": 380
+  },
+  {
+    "id": "CREAM",
+    "name": "CREAM",
+    "bg": "#FFFDD0",
+    "accent": "#F2E6B4",
+    "text": "#000000",
+    "price": 380
+  },
+  {
+    "id": "LATTE",
+    "name": "LATTE",
+    "bg": "#C5A880",
+    "accent": "#DDB892",
+    "text": "#000000",
+    "price": 380
+  },
+  {
+    "id": "MINT_JULEP",
+    "name": "MINT JULEP",
+    "bg": "#F1FFDA",
+    "accent": "#D3F7A5",
+    "text": "#000000",
+    "price": 390
+  },
+  {
+    "id": "GHOST_WHITE",
+    "name": "GHOST WHITE",
+    "bg": "#F8F8FF",
+    "accent": "#E8E8FF",
+    "text": "#000000",
+    "price": 390
+  },
+  {
+    "id": "SLATE_BLUE",
+    "name": "SLATE BLUE",
+    "bg": "#6A5ACD",
+    "accent": "#8974FF",
+    "text": "#FFFFFF",
+    "price": 390
+  },
+  {
+    "id": "COASTAL_TEAL",
+    "name": "COASTAL TEAL",
+    "bg": "#2BB6A8",
+    "accent": "#62D8C8",
+    "text": "#FFFFFF",
+    "price": 400
+  },
+  {
+    "id": "CYBER_YLW",
+    "name": "CYBER YLW",
+    "bg": "#0A0A0A",
+    "accent": "#E6FF00",
+    "text": "#FFFFFF",
+    "price": 420
+  },
+  {
+    "id": "GALAXY",
+    "name": "GALAXY",
+    "bg": "#2B002E",
+    "accent": "#FF2EC4",
+    "text": "#FFFFFF",
+    "price": 420
+  },
+  {
+    "id": "CYAN_XR",
+    "name": "CYAN XR",
+    "bg": "#001E26",
+    "accent": "#00F0FF",
+    "text": "#FFFFFF",
+    "price": 420
+  },
+  {
+    "id": "NEON_PURPLE",
+    "name": "NEON PURPLE",
+    "bg": "#21003A",
+    "accent": "#BF00FF",
+    "text": "#FFFFFF",
+    "price": 420
+  },
+  {
+    "id": "AUBERGINE",
+    "name": "AUBERGINE",
+    "bg": "#1A0016",
+    "accent": "#5A006A",
+    "text": "#FFFFFF",
+    "price": 420
+  },
+  {
+    "id": "GOLD_FX",
+    "name": "GOLD FX",
+    "bg": "#FFE087",
+    "accent": "#FFCD47",
+    "text": "#000000",
+    "price": 420
+  },
+  {
+    "id": "ROYAL",
+    "name": "ROYAL",
+    "bg": "#0A0033",
+    "accent": "#2D00A1",
+    "text": "#FFFFFF",
+    "price": 420
+  },
+  {
+    "id": "NEBULA",
+    "name": "NEBULA",
+    "bg": "#0B0121",
+    "accent": "#4A148C",
+    "text": "#FFFFFF",
+    "price": 430
+  },
+  {
+    "id": "LIGHT_BLUE",
+    "name": "LIGHT BLUE",
+    "bg": "#3DD9BA",
+    "accent": "#45D6A8",
+    "text": "#FFFFFF",
+    "price": 430
+  }
+]

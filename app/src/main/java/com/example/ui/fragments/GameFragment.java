@@ -1,0 +1,524 @@
+package com.example.ui.fragments;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.os.VibratorManager;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.MainActivity;
+import com.example.R;
+import com.example.data.GamePrefs;
+import com.example.data.PuzzleGenerator;
+import com.example.data.WordBankRepository;
+import com.example.model.Category;
+import com.example.model.Difficulty;
+import com.example.model.GameTheme;
+import com.example.ui.GamePopupDialog;
+import com.example.ui.ThemeHelper;
+import com.example.ui.WordFlowLayout;
+import com.example.ui.WordGridView;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+public class GameFragment extends Fragment {
+
+    private static final String ARG_DIFFICULTY = "arg_difficulty";
+    private static final String ARG_CATEGORY = "arg_category";
+    private static final String ARG_LEVEL = "arg_level";
+    private static final long WRONG_WORD_VIBRATE_MS = 90L;
+
+    private Difficulty difficulty;
+    private Category category;
+    private int level;
+
+    private WordGridView wordGridView;
+    private WordFlowLayout wordFlowLayout;
+    private Button btnHint;
+    private TextView tvCoinPill;
+    private TextView tvTimerPill;
+
+    private PuzzleGenerator.PuzzleBoard board;
+    private final Map<String, TextView> wordChips = new HashMap<>();
+    private CountDownTimer hardTimer;
+    private boolean levelFinished = false;
+
+    private int hintsUsed = 0;
+    private int hintedWordIdx = -1;
+    private int remainingSeconds = 0;
+
+    private GamePrefs prefsRef;
+    private GamePrefs.OnEconomyChangeListener economyListener;
+
+    public static GameFragment newInstance(Difficulty difficulty, Category category, int level) {
+        GameFragment f = new GameFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_DIFFICULTY, difficulty.keyPrefix);
+        args.putString(ARG_CATEGORY, category.displayName);
+        args.putInt(ARG_LEVEL, level);
+        f.setArguments(args);
+        return f;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_game, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        MainActivity act = (MainActivity) requireActivity();
+        GamePrefs prefs = act.getGamePrefs();
+        this.prefsRef = prefs;
+        GameTheme theme = prefs.getCurrentTheme();
+
+        Bundle args = getArguments();
+        difficulty = Difficulty.fromKey(args != null ? args.getString(ARG_DIFFICULTY) : "easy");
+        category = Category.fromName(args != null ? args.getString(ARG_CATEGORY) : "GENERAL");
+        level = args != null ? args.getInt(ARG_LEVEL, 1) : 1;
+
+        ThemeHelper.applyRootTheme(view.findViewById(R.id.game_root), theme);
+        ThemeHelper.styleCard(view.findViewById(R.id.board_container), theme.boardColor, 14);
+
+        btnHint = view.findViewById(R.id.btn_hint);
+        tvCoinPill = view.findViewById(R.id.tv_coin_pill);
+        tvTimerPill = view.findViewById(R.id.tv_timer_pill);
+        TextView tvTitle = view.findViewById(R.id.tv_game_title);
+        wordGridView = view.findViewById(R.id.word_grid_view);
+        wordFlowLayout = view.findViewById(R.id.word_flow_layout);
+        Button btnBack = view.findViewById(R.id.btn_back);
+        Button btnClearLevel = view.findViewById(R.id.btn_clear_level);
+
+        ThemeHelper.styleHeaderText(tvTitle, theme);
+        ThemeHelper.styleCard(tvCoinPill, theme.surfaceColor, 12);
+        tvCoinPill.setTextColor(theme.textPrimaryColor);
+        ThemeHelper.styleCard(tvTimerPill, theme.surfaceColor, 12);
+        ThemeHelper.stylePrimaryButton(btnBack, theme);
+        ThemeHelper.stylePrimaryButton(btnClearLevel, theme);
+
+        if (difficulty == Difficulty.DAILY) {
+            tvTitle.setText("🌞 Daily Puzzle");
+        } else {
+            tvTitle.setText(category.displayName + " - Level " + level);
+        }
+
+        if (difficulty.hintsAllowed) {
+            ThemeHelper.stylePrimaryButton(btnHint, theme);
+        } else {
+            ThemeHelper.styleButton(btnHint, Color.parseColor("#3A3F54"), Color.parseColor("#9AA0B8"), 12);
+        }
+
+        view.findViewById(R.id.btn_hamburger).setOnClickListener(v -> act.openSideMenu());
+
+        btnHint.setOnClickListener(v -> handleHintTap(act, prefs, theme));
+        btnBack.setOnClickListener(v -> act.navigateBack());
+        btnClearLevel.setOnClickListener(v -> {
+            act.getSoundManager().playClick();
+            clearLevelForReplay(act, prefs, theme, true);
+        });
+
+        economyListener = (coins, hints) -> {
+            if (isAdded()) {
+                refreshTopBar(prefs);
+            }
+        };
+        prefs.addEconomyChangeListener(economyListener);
+
+        setupPuzzle(act, prefs, theme);
+        refreshTopBar(prefs);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() instanceof MainActivity) {
+            MainActivity act = (MainActivity) getActivity();
+            GamePrefs prefs = act.getGamePrefs();
+            GameTheme theme = prefs.getCurrentTheme();
+            refreshTopBar(prefs);
+            if (wordGridView != null) {
+                wordGridView.setTheme(theme);
+                wordGridView.setColorblindMode(prefs.isColorblindMode());
+                wordGridView.setPerformanceMode(prefs.isPerformanceMode());
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (prefsRef != null && board != null) {
+            saveCurrentState(prefsRef, board.allFound());
+        }
+    }
+
+    private void refreshTopBar(GamePrefs prefs) {
+        if (btnHint != null) {
+            btnHint.setText("💡(" + prefs.getHints() + ")");
+        }
+        if (tvCoinPill != null) {
+            tvCoinPill.setText("⭐ " + prefs.getCoins());
+        }
+    }
+
+    private void setupPuzzle(MainActivity act, GamePrefs prefs, GameTheme theme) {
+        GamePrefs.SavedLevelState saved = prefs.loadLevelState(difficulty, category, level);
+        if (saved != null && saved.board != null && !saved.board.placedWords.isEmpty()) {
+            board = saved.board;
+            hintsUsed = saved.hintsUsed;
+            hintedWordIdx = saved.hintedWordIdx;
+            remainingSeconds = saved.remainingSeconds > 0
+                    ? saved.remainingSeconds : difficulty.timeLimitSeconds;
+            wordGridView.setBoard(board);
+            wordGridView.setNextColorIdx(saved.nextColorIdx);
+        } else {
+            List<String> words = WordBankRepository.getWordsForLevel(category, difficulty, level);
+            board = PuzzleGenerator.generate(category, difficulty, level, words);
+            hintsUsed = 0;
+            hintedWordIdx = -1;
+            if (prefs.isLevelCompleted(difficulty, category, level)) {
+                // Upgrade path: pre-existing completed level without saved board state
+                for (int i = 0; i < board.placedWords.size(); i++) {
+                    PuzzleGenerator.PlacedWord pw = board.placedWords.get(i);
+                    pw.found = true;
+                    pw.colorIndex = i;
+                }
+                remainingSeconds = 0;
+                wordGridView.setBoard(board);
+                saveCurrentState(prefs, true);
+            } else {
+                remainingSeconds = difficulty.timeLimitSeconds;
+                wordGridView.setBoard(board);
+                saveCurrentState(prefs, false);
+            }
+        }
+
+        wordGridView.setTheme(theme);
+        wordGridView.setColorblindMode(prefs.isColorblindMode());
+        wordGridView.setPerformanceMode(prefs.isPerformanceMode());
+        wordGridView.setListener(new WordGridView.OnWordGridListener() {
+            @Override
+            public void onWordFound(PuzzleGenerator.PlacedWord word) {
+                act.getSoundManager().playWordFound();
+                if (hintedWordIdx >= 0 && hintedWordIdx < board.placedWords.size()
+                        && board.placedWords.get(hintedWordIdx) == word) {
+                    hintedWordIdx = -1;
+                }
+                boolean nowAllFound = board.allFound();
+                saveCurrentState(prefs, nowAllFound);
+                prefs.incrementWordsFound(1);
+                act.checkAndNotifyAchievements();
+                refreshTopBar(prefs);
+                updateWordChipFound(word.word, theme);
+                if (!levelFinished && nowAllFound) {
+                    onLevelCompleted(act, prefs, theme);
+                }
+            }
+
+            @Override
+            public void onInvalidSelection() {
+                act.getSoundManager().playError();
+                vibrateWrongWord(act);
+            }
+        });
+
+        buildWordChips(theme);
+        if (hintedWordIdx >= 0 && hintedWordIdx < board.placedWords.size()) {
+            PuzzleGenerator.PlacedWord hinted = board.placedWords.get(hintedWordIdx);
+            if (!hinted.found) {
+                wordGridView.showHintForWord(hinted);
+            } else {
+                hintedWordIdx = -1;
+            }
+        }
+
+        if (board.allFound()) {
+            levelFinished = true;
+            stopTimer();
+            if (tvTimerPill != null) {
+                tvTimerPill.setVisibility(View.GONE);
+            }
+            showCompletedLevelEntryPopup(act, prefs, theme);
+        } else {
+            levelFinished = false;
+            startTimerIfHardMode(act, prefs, theme, remainingSeconds);
+        }
+    }
+
+    private void showCompletedLevelEntryPopup(MainActivity act, GamePrefs prefs, GameTheme theme) {
+        new GamePopupDialog.Builder(requireContext(), theme)
+                .setTitle(difficulty == Difficulty.DAILY ? "🌞 Daily Puzzle Completed" : "✅ Level Completed")
+                .setMessage("This level is already completed. Do you want to clear this level before playing again?")
+                .setPositiveButton("Clear Level", () -> clearLevelForReplay(act, prefs, theme, false))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void clearLevelForReplay(MainActivity act, GamePrefs prefs, GameTheme theme, boolean showToast) {
+        stopTimer();
+        levelFinished = false;
+        hintsUsed = 0;
+        hintedWordIdx = -1;
+        remainingSeconds = difficulty.timeLimitSeconds;
+
+        if (board != null) {
+            for (PuzzleGenerator.PlacedWord pw : board.placedWords) {
+                pw.found = false;
+                pw.colorIndex = -1;
+            }
+            wordGridView.setBoard(board);
+            wordGridView.setNextColorIdx(0);
+            saveCurrentState(prefs, false);
+            buildWordChips(theme);
+        }
+        startTimerIfHardMode(act, prefs, theme, remainingSeconds);
+        refreshTopBar(prefs);
+        if (showToast) {
+            Toast.makeText(requireContext(), "Level reset!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveCurrentState(GamePrefs prefs, boolean completed) {
+        if (prefs == null || board == null) return;
+        int nextIdx = wordGridView != null ? wordGridView.getNextColorIdx() : 0;
+        prefs.saveLevelState(
+                difficulty,
+                category,
+                level,
+                board,
+                nextIdx,
+                hintsUsed,
+                hintedWordIdx,
+                remainingSeconds,
+                completed
+        );
+    }
+
+    private void buildWordChips(GameTheme theme) {
+        wordFlowLayout.removeAllViews();
+        wordChips.clear();
+        int padH = ThemeHelper.dp(requireContext(), 12);
+        int padV = ThemeHelper.dp(requireContext(), 7);
+
+        for (PuzzleGenerator.PlacedWord pw : board.placedWords) {
+            TextView chip = new TextView(requireContext());
+            chip.setText(pw.word);
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            chip.setTypeface(chip.getTypeface(), android.graphics.Typeface.BOLD);
+            chip.setPadding(padH, padV, padH, padV);
+            chip.setTextColor(theme.textPrimaryColor);
+            ThemeHelper.styleCard(chip, theme.tileColor, 8);
+            wordFlowLayout.addView(chip);
+            wordChips.put(pw.word, chip);
+            if (pw.found) {
+                updateWordChipFound(pw.word, theme);
+            }
+        }
+    }
+
+    private void updateWordChipFound(String word, GameTheme theme) {
+        TextView chip = wordChips.get(word);
+        if (chip != null) {
+            chip.setTextColor(theme.primaryButtonColor);
+            chip.setPaintFlags(chip.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+    }
+
+    private void handleHintTap(MainActivity act, GamePrefs prefs, GameTheme theme) {
+        if (!difficulty.hintsAllowed) {
+            act.getSoundManager().playError();
+            new GamePopupDialog.Builder(requireContext(), theme)
+                    .setTitle("💡 Hints Disabled")
+                    .setMessage("Hints are disabled in Normal, Hard, and Daily modes!")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+        if (board == null || board.allFound()) return;
+        if (prefs.getHints() <= 0) {
+            act.getSoundManager().playError();
+            new GamePopupDialog.Builder(requireContext(), theme)
+                    .setTitle("💡 No Hints Left")
+                    .setMessage("No hints remaining! You can buy more hints in the Shop.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+        for (int i = 0; i < board.placedWords.size(); i++) {
+            PuzzleGenerator.PlacedWord pw = board.placedWords.get(i);
+            if (!pw.found) {
+                if (prefs.consumeHint()) {
+                    act.getSoundManager().playClick();
+                    hintsUsed++;
+                    hintedWordIdx = i;
+                    saveCurrentState(prefs, false);
+                    refreshTopBar(prefs);
+                    wordGridView.showHintForWord(pw);
+                    Toast.makeText(requireContext(),
+                            "Hint: Look at the highlighted letters for " + pw.word + "!",
+                            Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+        }
+    }
+
+    private void startTimerIfHardMode(MainActivity act, GamePrefs prefs, GameTheme theme, int initialSeconds) {
+        stopTimer();
+        if (difficulty.timeLimitSeconds <= 0) {
+            tvTimerPill.setVisibility(View.GONE);
+            return;
+        }
+        int startSec = initialSeconds > 0 ? initialSeconds : difficulty.timeLimitSeconds;
+        remainingSeconds = startSec;
+        tvTimerPill.setVisibility(View.VISIBLE);
+        updateTimerText(startSec);
+        hardTimer = new CountDownTimer(startSec * 1000L, 1000L) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (!isAdded()) return;
+                remainingSeconds = (int) Math.ceil(millisUntilFinished / 1000.0);
+                updateTimerText(remainingSeconds);
+            }
+
+            @Override
+            public void onFinish() {
+                if (!isAdded() || levelFinished) return;
+                remainingSeconds = 0;
+                updateTimerText(0);
+                onHardModeTimeUp(act, prefs, theme);
+            }
+        }.start();
+    }
+
+    private void updateTimerText(int seconds) {
+        int min = seconds / 60;
+        int sec = seconds % 60;
+        tvTimerPill.setText(String.format(Locale.US, "⏱ %02d:%02d", min, sec));
+    }
+
+    private void stopTimer() {
+        if (hardTimer != null) {
+            hardTimer.cancel();
+            hardTimer = null;
+        }
+    }
+
+    private void onHardModeTimeUp(MainActivity act, GamePrefs prefs, GameTheme theme) {
+        levelFinished = true;
+        act.getSoundManager().playError();
+        new GamePopupDialog.Builder(requireContext(), theme)
+                .setTitle("⏰ Time's Up!")
+                .setMessage("Hard mode 120-second timer expired before all words were found.")
+                .setCancelable(false)
+                .setPositiveButton("Retry", () -> clearLevelForReplay(act, prefs, theme, false))
+                .setNegativeButton("Back", act::navigateBack)
+                .show();
+    }
+
+    private void onLevelCompleted(MainActivity act, GamePrefs prefs, GameTheme theme) {
+        levelFinished = true;
+        stopTimer();
+        act.getSoundManager().playLevelComplete();
+
+        boolean alreadyRewarded = prefs.isLevelRewardClaimed(difficulty, category, level);
+        boolean firstClear = prefs.markLevelCompleted(difficulty, category, level);
+        saveCurrentState(prefs, true);
+
+        boolean grantReward = firstClear && !alreadyRewarded;
+        int reward = grantReward ? difficulty.rewardCoins : 0;
+        if (grantReward && reward > 0) {
+            prefs.addCoins(reward);
+        }
+        refreshTopBar(prefs);
+        act.checkAndNotifyAchievements();
+
+        String title = (difficulty == Difficulty.DAILY) ? "🌞 Daily Puzzle Complete!" : "🎉 Level Complete!";
+        if (grantReward) {
+            String message = "Great job! You found all words and earned +" + reward + " ⭐ coins!";
+            String nextLabel = (difficulty != Difficulty.DAILY && level < 100) ? "Next Level" : "Awesome!";
+            new GamePopupDialog.Builder(requireContext(), theme)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton(nextLabel, () -> {
+                        if (difficulty != Difficulty.DAILY && level < 100) {
+                            act.navigateTo(GameFragment.newInstance(difficulty, category, level + 1), false);
+                        } else {
+                            act.navigateBack();
+                        }
+                    })
+                    .setNegativeButton("Back", act::navigateBack)
+                    .show();
+        } else {
+            new GamePopupDialog.Builder(requireContext(), theme)
+                    .setTitle(title)
+                    .setMessage("Great job! You completed this level again.\n(Completion reward already claimed)")
+                    .setCancelable(false)
+                    .setPositiveButton("Next", () -> {
+                        if (difficulty != Difficulty.DAILY && level < 100) {
+                            act.navigateTo(GameFragment.newInstance(difficulty, category, level + 1), false);
+                        } else {
+                            act.navigateBack();
+                        }
+                    })
+                    .setNegativeButton("Back", act::navigateBack)
+                    .show();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void vibrateWrongWord(Context context) {
+        if (context == null) return;
+        try {
+            Vibrator vibrator;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                VibratorManager vm = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+                vibrator = (vm != null) ? vm.getDefaultVibrator() : null;
+            } else {
+                vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            }
+            if (vibrator != null && vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(
+                            WRONG_WORD_VIBRATE_MS, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    vibrator.vibrate(WRONG_WORD_VIBRATE_MS);
+                }
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    public int getHintsUsedForCurrentLevel() {
+        return hintsUsed;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (prefsRef != null && economyListener != null) {
+            prefsRef.removeEconomyChangeListener(economyListener);
+        }
+        stopTimer();
+    }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="bg_default">#FF1C1F2E</color>
+    <color name="surface_default">#FF262A3E</color>
+    <color name="board_bg_default">#FF23273A</color>
+    <color name="tile_bg_default">#FF2E3348</color>
+    <color name="accent_blue">#FF42A5F5</color>
+    <color name="accent_blue_pressed">#FF2196F3</color>
+    <color name="level_completed">#FF22C55E</color>
+    <color name="level_locked">#FF3A3F54</color>
+    <color name="text_muted">#FF8C92AC</color>
+    <color name="gold_accent">#FFFBBF24</color>
+    <color name="gold_card_fill">#FFFACC15</color>
+    <color name="chest_common">#FF22C55E</color>
+    <color name="chest_rare">#FF42A5F5</color>
+    <color name="chest_legendary">#FFFBBF24</color>
+    <color name="achievement_locked_bg">#FF2D4C6E</color>
+</resources>
