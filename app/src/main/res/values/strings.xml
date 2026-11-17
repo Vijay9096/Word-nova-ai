@@ -5,7 +5,6 @@
     <string name="btn_play">Play</string>
     <string name="btn_clear_storage">Clear Local Storage</string>
     <string name="btn_reset_progress">Reset Progress</string>
-    <string name="btn_unlock_all_levels">Unlock All Levels</string>
     <string name="btn_back">Back</string>
     <string name="btn_close">Close</string>
     <string name="btn_close_menu">Close Menu</string>
@@ -33,4 +32,8 @@
     <string name="about_developer">Developer: Vijay R. M.</string>
     <string name="about_version">Version: 1.0.3 (Native Android)</string>
     <string name="about_engine">Engine: Android SDK (Java + XML)</string>
+    <string name="cd_splash_art">Word Nova splash artwork</string>
+    <string name="splash_loading_label">Loading Word Nova…</string>
+    <string name="splash_error_message">Unable to finish loading game resources. Please try again.</string>
+    <string name="btn_retry">Retry</string>
 </resources>

@@ -145,61 +145,44 @@ public class WordNovaLayoutAndTestingFeatureTest {
     }
 
     @Test
-    public void testUnlockAllLevelsTestingButtonPreservesProgressAndRewards() {
+    public void testUnlockAllLevelsRemovedAndNormalProgressionRestored() {
         ActivityController<MainActivity> controller = Robolectric.buildActivity(MainActivity.class);
         MainActivity activity = controller.create().start().resume().visible().get();
         GamePrefs prefs = activity.getGamePrefs();
         prefs.clearAllLocalStorage();
 
-        // Simulate existing player progress before testing unlock
-        prefs.addCoins(50);          // 150 total
-        prefs.addHints(3);           // 5 total
+        // Simulate existing player progress and an obsolete leftover testing flag from earlier builds
+        prefs.addCoins(50);
+        prefs.addHints(3);
         prefs.markLevelCompleted(Difficulty.EASY, Category.GENERAL, 1);
-        int coinsBefore = prefs.getCoins();
-        int hintsBefore = prefs.getHints();
-        int completedCountBefore = prefs.getLevelsCompletedCount();
+        activity.getSharedPreferences("word_nova_prefs", android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("testing_all_levels_unlocked", true)
+                .apply();
 
-        // Normally level 50 across categories is locked
-        assertFalse(prefs.isLevelUnlocked(Difficulty.EASY, Category.PROFESSION, 50));
-        assertFalse(prefs.isLevelUnlocked(Difficulty.NORMAL, Category.ANIMAL, 25));
-        assertFalse(prefs.isLevelUnlocked(Difficulty.HARD, Category.VEHICLES, 100));
+        // Re-initializing GamePrefs cleans up obsolete testing key WITHOUT deleting player progress
+        GamePrefs refreshedPrefs = new GamePrefs(activity);
+        assertEquals(150, refreshedPrefs.getCoins());
+        assertEquals(5, refreshedPrefs.getHints());
+        assertTrue(refreshedPrefs.isLevelCompleted(Difficulty.EASY, Category.GENERAL, 1));
 
-        // Verify Unlock All Levels button exists on the first screen (MainMenuFragment)
+        // Normal progression restored: level 1 unlocked, level 2 unlocked via completion of 1,
+        // while uncompleted later levels remain locked
+        assertTrue(refreshedPrefs.isLevelUnlocked(Difficulty.EASY, Category.GENERAL, 1));
+        assertTrue(refreshedPrefs.isLevelUnlocked(Difficulty.EASY, Category.GENERAL, 2));
+        assertFalse(refreshedPrefs.isLevelUnlocked(Difficulty.EASY, Category.GENERAL, 3));
+        assertFalse(refreshedPrefs.isLevelUnlocked(Difficulty.EASY, Category.PROFESSION, 50));
+        assertFalse(refreshedPrefs.isLevelUnlocked(Difficulty.NORMAL, Category.ANIMAL, 25));
+
+        // Verify Unlock All Levels button is completely removed from MainMenuFragment
         MainMenuFragment menu = (MainMenuFragment) activity.getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_container);
         assertNotNull(menu);
-        Button btnUnlockAll = menu.requireView().findViewById(R.id.btn_unlock_all_levels);
-        assertNotNull(btnUnlockAll);
-        assertEquals("Unlock All Levels", btnUnlockAll.getText().toString());
-
-        btnUnlockAll.performClick();
-
-        // All 100 levels across all categories & difficulties are now unlocked for testing
-        for (Difficulty d : new Difficulty[]{Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD}) {
-            for (Category c : Category.values()) {
-                assertTrue(prefs.isLevelUnlocked(d, c, 1));
-                assertTrue(prefs.isLevelUnlocked(d, c, 50));
-                assertTrue(prefs.isLevelUnlocked(d, c, 100));
-            }
-        }
-
-        // Verify coins, hints, achievements, completed flags, and stats remain completely unchanged
-        assertEquals(coinsBefore, prefs.getCoins());
-        assertEquals(hintsBefore, prefs.getHints());
-        assertEquals(completedCountBefore, prefs.getLevelsCompletedCount());
-        assertTrue(prefs.isLevelCompleted(Difficulty.EASY, Category.GENERAL, 1));
-        assertFalse("Unplayed levels must NOT be marked completed",
-                prefs.isLevelCompleted(Difficulty.EASY, Category.PROFESSION, 50));
-
-        // Verify level content & word list are untouched when launching an unlocked high level
-        List<String> expectedWords = WordBankRepository.getWordsForLevel(Category.PROFESSION, Difficulty.NORMAL, 50);
-        GameFragment launched = GameFragment.newInstance(Difficulty.NORMAL, Category.PROFESSION, 50);
-        activity.navigateTo(launched, true);
-        activity.getSupportFragmentManager().executePendingTransactions();
-        TextView title = launched.requireView().findViewById(R.id.tv_game_title);
-        assertTrue(title.getText().toString().contains("Level 50"));
-        WordFlowLayout flow = launched.requireView().findViewById(R.id.word_flow_layout);
-        assertEquals(expectedWords.size(), flow.getChildCount());
+        int removedId = activity.getResources().getIdentifier("btn_unlock_all_levels", "id", activity.getPackageName());
+        assertEquals("btn_unlock_all_levels ID should be removed", 0, removedId);
+        assertNotNull(menu.requireView().findViewById(R.id.btn_play));
+        assertNotNull(menu.requireView().findViewById(R.id.btn_clear_storage));
+        assertNotNull(menu.requireView().findViewById(R.id.btn_reset_progress));
 
         controller.pause().stop().destroy();
     }

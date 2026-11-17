@@ -17,4 +17,5 @@
     <color name="chest_rare">#FF42A5F5</color>
     <color name="chest_legendary">#FFFBBF24</color>
     <color name="achievement_locked_bg">#FF2D4C6E</color>
+    <color name="splash_bg">#FF040715</color>
 </resources>

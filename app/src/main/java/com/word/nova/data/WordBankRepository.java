@@ -40,15 +40,43 @@ public class WordBankRepository {
     private static volatile Map<String, List<String>> categoryWords = Collections.emptyMap();
     private static volatile boolean initialized = false;
 
+    public interface ProgressListener {
+        void onCategoryLoaded(int loadedCount, int totalCount, String categoryName);
+    }
+
     public static void ensureInitialized(Context context) {
-        if (initialized || context == null) return;
+        ensureInitialized(context, null);
+    }
+
+    public static void ensureInitialized(Context context, ProgressListener listener) {
+        if (context == null) return;
+        if (initialized) {
+            if (listener != null) {
+                Category[] cats = Category.values();
+                for (int i = 0; i < cats.length; i++) {
+                    listener.onCategoryLoaded(i + 1, cats.length, cats[i].displayName);
+                }
+            }
+            return;
+        }
         synchronized (WordBankRepository.class) {
-            if (initialized) return;
+            if (initialized) {
+                if (listener != null) {
+                    Category[] cats = Category.values();
+                    for (int i = 0; i < cats.length; i++) {
+                        listener.onCategoryLoaded(i + 1, cats.length, cats[i].displayName);
+                    }
+                }
+                return;
+            }
             Category.ensureInitialized(context);
             Context appCtx = context.getApplicationContext();
             Map<String, List<String>> loaded = new HashMap<>();
+            Category[] categories = Category.values();
+            int total = categories.length;
 
-            for (Category cat : Category.values()) {
+            for (int i = 0; i < total; i++) {
+                Category cat = categories[i];
                 Set<String> exactWords = new LinkedHashSet<>();
                 try (BufferedReader reader = new BufferedReader(
                         new InputStreamReader(appCtx.getAssets().open("words/" + cat.fileName), StandardCharsets.UTF_8)
@@ -64,6 +92,9 @@ public class WordBankRepository {
                     throw new IllegalStateException("Failed to load word list for category " + cat.displayName, e);
                 }
                 loaded.put(cat.id, Collections.unmodifiableList(new ArrayList<>(exactWords)));
+                if (listener != null) {
+                    listener.onCategoryLoaded(i + 1, total, cat.displayName);
+                }
             }
 
             categoryWords = Collections.unmodifiableMap(loaded);
