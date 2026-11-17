@@ -25,6 +25,7 @@ import com.example.model.Achievement;
 import com.example.model.Category;
 import com.example.model.Difficulty;
 import com.example.model.GameTheme;
+import com.example.ui.GameAnimations;
 import com.example.ui.ThemeHelper;
 import com.example.ui.fragments.AchievementsFragment;
 import com.example.ui.fragments.DailyPuzzleIntroFragment;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout rootContainer;
     private View sideMenuOverlay;
     private View menuCard;
+    private boolean isMenuClosing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +146,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openSideMenu() {
+        if (sideMenuOverlay.getVisibility() == View.VISIBLE && !isMenuClosing) {
+            return;
+        }
+        isMenuClosing = false;
         soundManager.playClick();
         GameTheme theme = gamePrefs.getCurrentTheme();
         ThemeHelper.styleCard(menuCard, theme.boardColor, 16);
@@ -156,11 +162,18 @@ public class MainActivity extends AppCompatActivity {
             Button b = findViewById(id);
             ThemeHelper.stylePrimaryButton(b, theme);
         }
-        sideMenuOverlay.setVisibility(View.VISIBLE);
+        boolean reduceMotion = GameAnimations.shouldReduceMotion(this, gamePrefs);
+        GameAnimations.triggerMenuAnimation(sideMenuOverlay, menuCard, true, reduceMotion, null);
     }
 
     public void closeSideMenu() {
-        sideMenuOverlay.setVisibility(View.GONE);
+        if (sideMenuOverlay.getVisibility() != View.VISIBLE || isMenuClosing) {
+            return;
+        }
+        isMenuClosing = true;
+        boolean reduceMotion = GameAnimations.shouldReduceMotion(this, gamePrefs);
+        GameAnimations.triggerMenuAnimation(sideMenuOverlay, menuCard, false, reduceMotion,
+                () -> isMenuClosing = false);
     }
 
     public void showLuckySpin() {
@@ -261,6 +274,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (sideMenuOverlay != null) sideMenuOverlay.animate().cancel();
+        if (menuCard != null) menuCard.animate().cancel();
         soundManager.release();
     }
 }

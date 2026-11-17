@@ -27,6 +27,11 @@ public class WordGridView extends View {
         void onInvalidSelection();
     }
 
+    public interface OnGridInteractionListener {
+        void onUserTouchStart();
+        void onUserTouchEnd();
+    }
+
     private static final int[] STANDARD_WORD_COLORS = {
             Color.parseColor("#EC407A"), // Pink/Magenta
             Color.parseColor("#7E57C2"), // Purple
@@ -68,12 +73,15 @@ public class WordGridView extends View {
     private GameTheme theme = GameTheme.DEFAULT;
     private boolean colorblindMode = false;
     private boolean performanceMode = false;
+    private boolean reducedMotion = false;
     private OnWordGridListener listener;
+    private OnGridInteractionListener interactionListener;
 
     private final Paint tilePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint effectPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF cellRect = new RectF();
 
     private float cellSize;
@@ -87,8 +95,20 @@ public class WordGridView extends View {
 
     private final List<int[]> hintedCells = new ArrayList<>();
     private float popScale = 1f;
+    private float pulseGlowAlpha = 0f;
     private final List<int[]> popCells = new ArrayList<>();
+    private final List<int[]> rippleCells = new ArrayList<>();
+    private float rippleWavePos = -1f;
+    private int rippleAccentColor = Color.WHITE;
+    private final List<int[]> blastCells = new ArrayList<>();
+    private float blastGlowProgress = 0f;
+    private int blastColor = Color.WHITE;
+    private float gridBreathPhase = 0f;
     private int nextColorIdx = 0;
+
+    private ValueAnimator pulseAnimator;
+    private ValueAnimator rippleAnimator;
+    private ValueAnimator blastAnimator;
 
     public WordGridView(Context context) {
         super(context);
@@ -110,6 +130,7 @@ public class WordGridView extends View {
         textPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
 
         borderPaint.setStyle(Paint.Style.STROKE);
+        effectPaint.setStyle(Paint.Style.STROKE);
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeCap(Paint.Cap.ROUND);
         linePaint.setStrokeJoin(Paint.Join.ROUND);
@@ -117,6 +138,14 @@ public class WordGridView extends View {
 
     public void setListener(OnWordGridListener listener) {
         this.listener = listener;
+    }
+
+    public void setInteractionListener(OnGridInteractionListener interactionListener) {
+        this.interactionListener = interactionListener;
+    }
+
+    public void setReducedMotion(boolean reducedMotion) {
+        this.reducedMotion = reducedMotion;
     }
 
     public void setTheme(GameTheme theme) {
@@ -164,10 +193,72 @@ public class WordGridView extends View {
         this.nextColorIdx = maxColor + 1;
         this.activeCells.clear();
         this.hintedCells.clear();
-        this.popCells.clear();
+        clearAnimations();
         this.isDragging = false;
         recomputeDimensions(getWidth(), getHeight());
         invalidate();
+    }
+
+    public void clearAnimations() {
+        if (pulseAnimator != null) {
+            pulseAnimator.cancel();
+            pulseAnimator = null;
+        }
+        if (rippleAnimator != null) {
+            rippleAnimator.cancel();
+            rippleAnimator = null;
+        }
+        if (blastAnimator != null) {
+            blastAnimator.cancel();
+            blastAnimator = null;
+        }
+        popCells.clear();
+        rippleCells.clear();
+        blastCells.clear();
+        popScale = 1f;
+        pulseGlowAlpha = 0f;
+        rippleWavePos = -1f;
+        blastGlowProgress = 0f;
+        gridBreathPhase = 0f;
+        invalidate();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        clearAnimations();
+    }
+
+    public void setGridBreathPhase(float phase) {
+        this.gridBreathPhase = Math.max(0f, Math.min(1f, phase));
+        invalidate();
+    }
+
+    public int getWordHighlightColor(PuzzleGenerator.PlacedWord word) {
+        int[] palette = colorblindMode ? COLORBLIND_WORD_COLORS : STANDARD_WORD_COLORS;
+        int idx = word != null && word.colorIndex >= 0 ? word.colorIndex : nextColorIdx;
+        return palette[Math.abs(idx) % palette.length];
+    }
+
+    public void computeWordLocalCenterAndSpan(PuzzleGenerator.PlacedWord word, float[] outXYWH) {
+        if (word == null || outXYWH == null || outXYWH.length < 4) return;
+        if (cellSize <= 0f || word.word.isEmpty()) {
+            outXYWH[0] = getWidth() / 2f;
+            outXYWH[1] = getHeight() / 2f;
+            outXYWH[2] = Math.max(40f, getWidth() * 0.4f);
+            outXYWH[3] = Math.max(40f, getHeight() * 0.15f);
+            return;
+        }
+        int endR = word.startRow + (word.word.length() - 1) * word.dRow;
+        int endC = word.startCol + (word.word.length() - 1) * word.dCol;
+        float x0 = padding + word.startCol * (cellSize + gap) + cellSize / 2f;
+        float y0 = padding + word.startRow * (cellSize + gap) + cellSize / 2f;
+        float x1 = padding + endC * (cellSize + gap) + cellSize / 2f;
+        float y1 = padding + endR * (cellSize + gap) + cellSize / 2f;
+        outXYWH[0] = (x0 + x1) / 2f;
+        outXYWH[1] = (y0 + y1) / 2f;
+        outXYWH[2] = Math.max(cellSize, Math.abs(x1 - x0) + cellSize);
+        outXYWH[3] = Math.max(cellSize, Math.abs(y1 - y0) + cellSize);
     }
 
     public int getNextColorIdx() {
@@ -239,19 +330,52 @@ public class WordGridView extends View {
                 boolean isActive = containsCell(activeCells, r, c);
                 boolean isHinted = containsCell(hintedCells, r, c);
                 boolean isPop = containsCell(popCells, r, c);
+                int rippleIdx = indexOfCell(rippleCells, r, c);
+                boolean isBlast = containsCell(blastCells, r, c);
 
                 int bgColor = cellColors[r][c] != 0 ? cellColors[r][c] : theme.tileColor;
                 if (isActive) {
                     bgColor = theme.primaryButtonColor;
+                } else if (gridBreathPhase > 0f && cellColors[r][c] == 0) {
+                    bgColor = androidx.core.graphics.ColorUtils.blendARGB(
+                            bgColor, theme.primaryButtonColor, gridBreathPhase * 0.09f);
+                }
+
+                float cellScale = 1f;
+                if (isPop && popScale != 1f) {
+                    cellScale = popScale;
+                }
+                if (rippleIdx >= 0 && rippleWavePos >= 0f) {
+                    float dist = Math.abs(rippleWavePos - rippleIdx);
+                    if (dist < 1.2f) {
+                        float waveStrength = 1f - (dist / 1.2f);
+                        cellScale = Math.max(cellScale, 1f + 0.14f * waveStrength);
+                        bgColor = androidx.core.graphics.ColorUtils.blendARGB(
+                                bgColor, Color.WHITE, 0.28f * waveStrength);
+                    }
                 }
 
                 canvas.save();
-                if (isPop && popScale != 1f) {
-                    canvas.scale(popScale, popScale, cellRect.centerX(), cellRect.centerY());
+                if (cellScale != 1f) {
+                    canvas.scale(cellScale, cellScale, cellRect.centerX(), cellRect.centerY());
                 }
 
                 tilePaint.setColor(bgColor);
                 canvas.drawRoundRect(cellRect, corner, corner, tilePaint);
+
+                if (isBlast && blastGlowProgress > 0f && blastGlowProgress < 1f) {
+                    int glowAlpha = Math.round((1f - blastGlowProgress) * 190f);
+                    effectPaint.setStrokeWidth(Math.max(2f, cellSize * 0.10f));
+                    effectPaint.setColor(androidx.core.graphics.ColorUtils.setAlphaComponent(
+                            blastColor, glowAlpha));
+                    canvas.drawRoundRect(cellRect, corner, corner, effectPaint);
+                } else if (isPop && pulseGlowAlpha > 0f) {
+                    int glowAlpha = Math.round(pulseGlowAlpha * 160f);
+                    effectPaint.setStrokeWidth(Math.max(2f, cellSize * 0.08f));
+                    effectPaint.setColor(androidx.core.graphics.ColorUtils.setAlphaComponent(
+                            rippleAccentColor, glowAlpha));
+                    canvas.drawRoundRect(cellRect, corner, corner, effectPaint);
+                }
 
                 if (isHinted && cellColors[r][c] == 0) {
                     borderPaint.setColor(Color.parseColor("#FBBF24"));
@@ -284,10 +408,15 @@ public class WordGridView extends View {
     }
 
     private boolean containsCell(List<int[]> list, int r, int c) {
-        for (int[] cell : list) {
-            if (cell[0] == r && cell[1] == c) return true;
+        return indexOfCell(list, r, c) >= 0;
+    }
+
+    private int indexOfCell(List<int[]> list, int r, int c) {
+        for (int i = 0; i < list.size(); i++) {
+            int[] cell = list.get(i);
+            if (cell[0] == r && cell[1] == c) return i;
         }
-        return false;
+        return -1;
     }
 
     @Override
@@ -300,7 +429,12 @@ public class WordGridView extends View {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                getParent().requestDisallowInterceptTouchEvent(true);
+                if (interactionListener != null) {
+                    interactionListener.onUserTouchStart();
+                }
+                if (getParent() != null) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                }
                 int[] start = pointToCell(x, y);
                 if (start != null) {
                     isDragging = true;
@@ -324,12 +458,17 @@ public class WordGridView extends View {
             case MotionEvent.ACTION_CANCEL:
                 if (!isDragging) return false;
                 isDragging = false;
-                getParent().requestDisallowInterceptTouchEvent(false);
+                if (getParent() != null) {
+                    getParent().requestDisallowInterceptTouchEvent(false);
+                }
                 if (action == MotionEvent.ACTION_UP) {
                     evaluateSelection();
                 }
                 activeCells.clear();
                 invalidate();
+                if (interactionListener != null) {
+                    interactionListener.onUserTouchEnd();
+                }
                 return true;
         }
         return super.onTouchEvent(event);
@@ -404,10 +543,13 @@ public class WordGridView extends View {
         if (matched != null) {
             matched.found = true;
             matched.colorIndex = nextColorIdx++;
-            // Clear hint if it belonged to this word
             hintedCells.clear();
-            if (!performanceMode) {
-                animatePop(matched.getCells());
+            if (!performanceMode && !reducedMotion) {
+                int color = getWordHighlightColor(matched);
+                List<int[]> cells = matched.getCells();
+                triggerCellPulse(cells, color);
+                triggerCellRipple(cells, color);
+                triggerWordRevealBlast(cells, color);
             }
             if (listener != null) {
                 listener.onWordFound(matched);
@@ -417,16 +559,61 @@ public class WordGridView extends View {
         }
     }
 
-    private void animatePop(List<int[]> cells) {
+    public void triggerCellPulse(List<int[]> cells, int color) {
+        if (cells == null || cells.isEmpty() || performanceMode || reducedMotion) return;
+        if (pulseAnimator != null) {
+            pulseAnimator.cancel();
+        }
         popCells.clear();
         popCells.addAll(cells);
-        ValueAnimator anim = ValueAnimator.ofFloat(1.0f, 1.14f, 1.0f);
-        anim.setDuration(260);
-        anim.setInterpolator(new OvershootInterpolator());
-        anim.addUpdateListener(a -> {
-            popScale = (float) a.getAnimatedValue();
+        rippleAccentColor = color;
+        pulseAnimator = ValueAnimator.ofFloat(0f, 1f);
+        pulseAnimator.setDuration(320L);
+        pulseAnimator.setInterpolator(new OvershootInterpolator(1.4f));
+        pulseAnimator.addUpdateListener(a -> {
+            float t = (float) a.getAnimatedValue();
+            popScale = 1f + (float) Math.sin(t * Math.PI) * 0.16f;
+            pulseGlowAlpha = 1f - t;
             invalidate();
         });
-        anim.start();
+        pulseAnimator.start();
+    }
+
+    public void triggerCellRipple(List<int[]> cells, int color) {
+        if (cells == null || cells.isEmpty() || performanceMode || reducedMotion) return;
+        if (rippleAnimator != null) {
+            rippleAnimator.cancel();
+        }
+        rippleCells.clear();
+        rippleCells.addAll(cells);
+        rippleAccentColor = color;
+        final float maxPos = cells.size() + 0.8f;
+        rippleAnimator = ValueAnimator.ofFloat(-0.6f, maxPos);
+        rippleAnimator.setDuration(Math.max(280L, Math.min(520L, cells.size() * 48L)));
+        rippleAnimator.addUpdateListener(a -> {
+            rippleWavePos = (float) a.getAnimatedValue();
+            if (rippleWavePos >= maxPos - 0.05f) {
+                rippleWavePos = -1f;
+            }
+            invalidate();
+        });
+        rippleAnimator.start();
+    }
+
+    public void triggerWordRevealBlast(List<int[]> cells, int color) {
+        if (cells == null || cells.isEmpty() || performanceMode || reducedMotion) return;
+        if (blastAnimator != null) {
+            blastAnimator.cancel();
+        }
+        blastCells.clear();
+        blastCells.addAll(cells);
+        blastColor = color;
+        blastAnimator = ValueAnimator.ofFloat(0f, 1f);
+        blastAnimator.setDuration(420L);
+        blastAnimator.addUpdateListener(a -> {
+            blastGlowProgress = (float) a.getAnimatedValue();
+            invalidate();
+        });
+        blastAnimator.start();
     }
 }

@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
@@ -30,6 +32,8 @@ import com.example.data.WordBankRepository;
 import com.example.model.Category;
 import com.example.model.Difficulty;
 import com.example.model.GameTheme;
+import com.example.ui.EffectsOverlayView;
+import com.example.ui.GameAnimations;
 import com.example.ui.GamePopupDialog;
 import com.example.ui.ThemeHelper;
 import com.example.ui.WordFlowLayout;
@@ -45,12 +49,17 @@ public class GameFragment extends Fragment {
     private static final String ARG_DIFFICULTY = "arg_difficulty";
     private static final String ARG_CATEGORY = "arg_category";
     private static final String ARG_LEVEL = "arg_level";
-    private static final long WRONG_WORD_VIBRATE_MS = 90L;
+    private static final long IDLE_BREATH_DELAY_MS = 4000L;
+    private static final long IDLE_HINT_DELAY_MS = 5500L;
 
     private Difficulty difficulty;
     private Category category;
     private int level;
 
+    private TextView tvTitle;
+    private View boardContainer;
+    private View wordScroll;
+    private EffectsOverlayView effectsOverlay;
     private WordGridView wordGridView;
     private WordFlowLayout wordFlowLayout;
     private Button btnHint;
@@ -67,7 +76,21 @@ public class GameFragment extends Fragment {
     private int remainingSeconds = 0;
 
     private GamePrefs prefsRef;
+    private GameTheme currentTheme;
     private GamePrefs.OnEconomyChangeListener economyListener;
+
+    private final GameAnimations animations = new GameAnimations();
+    private final Handler idleHandler = new Handler(Looper.getMainLooper());
+    private final Runnable startBreathRunnable = () -> {
+        if (!isAdded() || levelFinished || isReduceMotion()) return;
+        animations.getGridBreath().start(boardContainer, wordGridView, false);
+    };
+    private final Runnable startHintPulseRunnable = () -> {
+        if (!isAdded() || levelFinished || isReduceMotion()) return;
+        if (difficulty != null && difficulty.hintsAllowed && prefsRef != null && prefsRef.getHints() > 0) {
+            animations.startHintPulse(btnHint, false);
+        }
+    };
 
     public static GameFragment newInstance(Difficulty difficulty, Category category, int level) {
         GameFragment f = new GameFragment();
@@ -92,6 +115,7 @@ public class GameFragment extends Fragment {
         GamePrefs prefs = act.getGamePrefs();
         this.prefsRef = prefs;
         GameTheme theme = prefs.getCurrentTheme();
+        this.currentTheme = theme;
 
         Bundle args = getArguments();
         difficulty = Difficulty.fromKey(args != null ? args.getString(ARG_DIFFICULTY) : "easy");
@@ -99,18 +123,20 @@ public class GameFragment extends Fragment {
         level = args != null ? args.getInt(ARG_LEVEL, 1) : 1;
 
         ThemeHelper.applyRootTheme(view.findViewById(R.id.game_root), theme);
-        ThemeHelper.styleCard(view.findViewById(R.id.board_container), theme.boardColor, 14);
+        boardContainer = view.findViewById(R.id.board_container);
+        wordScroll = view.findViewById(R.id.word_scroll);
+        effectsOverlay = view.findViewById(R.id.effects_overlay);
+        ThemeHelper.styleCard(boardContainer, theme.boardColor, 14);
 
         btnHint = view.findViewById(R.id.btn_hint);
         tvCoinPill = view.findViewById(R.id.tv_coin_pill);
         tvTimerPill = view.findViewById(R.id.tv_timer_pill);
-        TextView tvTitle = view.findViewById(R.id.tv_game_title);
+        tvTitle = view.findViewById(R.id.tv_game_title);
         wordGridView = view.findViewById(R.id.word_grid_view);
         wordFlowLayout = view.findViewById(R.id.word_flow_layout);
         Button btnBack = view.findViewById(R.id.btn_back);
         Button btnClearLevel = view.findViewById(R.id.btn_clear_level);
         View contentArea = view.findViewById(R.id.game_content_area);
-        View boardContainer = view.findViewById(R.id.board_container);
         View bottomButtons = view.findViewById(R.id.bottom_buttons_container);
 
         ThemeHelper.styleHeaderText(tvTitle, theme);
@@ -143,11 +169,22 @@ public class GameFragment extends Fragment {
             ThemeHelper.styleButton(btnHint, Color.parseColor("#3A3F54"), Color.parseColor("#9AA0B8"), 12);
         }
 
-        view.findViewById(R.id.btn_hamburger).setOnClickListener(v -> act.openSideMenu());
+        view.findViewById(R.id.btn_hamburger).setOnClickListener(v -> {
+            stopIdleAnimationsImmediately();
+            act.openSideMenu();
+        });
 
-        btnHint.setOnClickListener(v -> handleHintTap(act, prefs, theme));
-        btnBack.setOnClickListener(v -> act.navigateBack());
+        btnHint.setOnClickListener(v -> {
+            stopIdleAnimationsImmediately();
+            handleHintTap(act, prefs, theme);
+            scheduleIdleAnimations();
+        });
+        btnBack.setOnClickListener(v -> {
+            stopIdleAnimationsImmediately();
+            act.navigateBack();
+        });
         btnClearLevel.setOnClickListener(v -> {
+            stopIdleAnimationsImmediately();
             act.getSoundManager().playClick();
             clearLevelForReplay(act, prefs, theme, true);
         });
@@ -163,6 +200,26 @@ public class GameFragment extends Fragment {
         refreshTopBar(prefs);
     }
 
+    private boolean isReduceMotion() {
+        return GameAnimations.shouldReduceMotion(getContext(), prefsRef);
+    }
+
+    private void stopIdleAnimationsImmediately() {
+        idleHandler.removeCallbacks(startBreathRunnable);
+        idleHandler.removeCallbacks(startHintPulseRunnable);
+        animations.getGridBreath().stop();
+        animations.stopHintPulse(btnHint);
+    }
+
+    private void scheduleIdleAnimations() {
+        stopIdleAnimationsImmediately();
+        if (!isAdded() || levelFinished || isReduceMotion()) return;
+        idleHandler.postDelayed(startBreathRunnable, IDLE_BREATH_DELAY_MS);
+        if (difficulty != null && difficulty.hintsAllowed && prefsRef != null && prefsRef.getHints() > 0) {
+            idleHandler.postDelayed(startHintPulseRunnable, IDLE_HINT_DELAY_MS);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -170,11 +227,16 @@ public class GameFragment extends Fragment {
             MainActivity act = (MainActivity) getActivity();
             GamePrefs prefs = act.getGamePrefs();
             GameTheme theme = prefs.getCurrentTheme();
+            this.currentTheme = theme;
             refreshTopBar(prefs);
             if (wordGridView != null) {
                 wordGridView.setTheme(theme);
                 wordGridView.setColorblindMode(prefs.isColorblindMode());
                 wordGridView.setPerformanceMode(prefs.isPerformanceMode());
+                wordGridView.setReducedMotion(GameAnimations.shouldReduceMotion(act, prefs));
+            }
+            if (!levelFinished) {
+                scheduleIdleAnimations();
             }
         }
     }
@@ -182,6 +244,7 @@ public class GameFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        stopIdleAnimationsImmediately();
         if (prefsRef != null && board != null) {
             saveCurrentState(prefsRef, board.allFound());
         }
@@ -228,13 +291,29 @@ public class GameFragment extends Fragment {
             }
         }
 
+        boolean reduce = isReduceMotion();
         wordGridView.setTheme(theme);
         wordGridView.setColorblindMode(prefs.isColorblindMode());
         wordGridView.setPerformanceMode(prefs.isPerformanceMode());
+        wordGridView.setReducedMotion(reduce);
+        wordGridView.setInteractionListener(new WordGridView.OnGridInteractionListener() {
+            @Override
+            public void onUserTouchStart() {
+                stopIdleAnimationsImmediately();
+            }
+
+            @Override
+            public void onUserTouchEnd() {
+                if (!levelFinished) {
+                    scheduleIdleAnimations();
+                }
+            }
+        });
         wordGridView.setListener(new WordGridView.OnWordGridListener() {
             @Override
             public void onWordFound(PuzzleGenerator.PlacedWord word) {
                 act.getSoundManager().playWordFound();
+                stopIdleAnimationsImmediately();
                 if (hintedWordIdx >= 0 && hintedWordIdx < board.placedWords.size()
                         && board.placedWords.get(hintedWordIdx) == word) {
                     hintedWordIdx = -1;
@@ -245,15 +324,38 @@ public class GameFragment extends Fragment {
                 act.checkAndNotifyAchievements();
                 refreshTopBar(prefs);
                 updateWordChipFound(word.word, theme);
+
+                boolean reduceNow = isReduceMotion();
+                int wordColor = wordGridView.getWordHighlightColor(word);
+                float[] gridPos = new float[4];
+                GameAnimations.resolveGridPointInOverlay(wordGridView, effectsOverlay, word, gridPos);
+                TextView chipView = wordChips.get(word.word);
+                animations.triggerWordPop(chipView, reduceNow);
+                animations.emitWordSparkles(effectsOverlay,
+                        gridPos[0], gridPos[1], gridPos[2], gridPos[3], wordColor, reduceNow);
+                if (effectsOverlay != null) {
+                    float[] chipCenter = GameAnimations.resolveCenterInRoot(chipView, requireView());
+                    animations.triggerRipple(effectsOverlay, chipCenter[0], chipCenter[1], wordColor, reduceNow);
+                    animations.emitWordSparkles(effectsOverlay,
+                            chipCenter[0], chipCenter[1], 72f, 28f, wordColor, reduceNow);
+                }
+                animations.triggerWordRevealBlast(
+                        null, effectsOverlay, word.getCells(), gridPos[0], gridPos[1], wordColor, reduceNow);
+
                 if (!levelFinished && nowAllFound) {
                     onLevelCompleted(act, prefs, theme);
+                } else if (!nowAllFound) {
+                    scheduleIdleAnimations();
                 }
             }
 
             @Override
             public void onInvalidSelection() {
+                stopIdleAnimationsImmediately();
                 act.getSoundManager().playError();
+                animations.triggerWrongShake(boardContainer, isReduceMotion());
                 vibrateWrongWord(act);
+                scheduleIdleAnimations();
             }
         });
 
@@ -270,6 +372,7 @@ public class GameFragment extends Fragment {
         if (board.allFound()) {
             levelFinished = true;
             stopTimer();
+            stopIdleAnimationsImmediately();
             if (tvTimerPill != null) {
                 tvTimerPill.setVisibility(View.GONE);
             }
@@ -277,7 +380,19 @@ public class GameFragment extends Fragment {
         } else {
             levelFinished = false;
             startTimerIfHardMode(act, prefs, theme, remainingSeconds);
+            startLevelEntryAnimations(theme);
         }
+    }
+
+    private void startLevelEntryAnimations(GameTheme theme) {
+        if (board == null) return;
+        boolean reduce = isReduceMotion();
+        animations.triggerLevelIntro(tvTitle, boardContainer, reduce, this::scheduleIdleAnimations);
+        animations.triggerWordListSlideIn(wordFlowLayout, reduce);
+        String toastText = (difficulty == Difficulty.DAILY)
+                ? "🌞 Daily Puzzle — Find " + board.placedWords.size() + " Words!"
+                : "✨ " + category.displayName + " Level " + level + " — Find " + board.placedWords.size() + " Words!";
+        animations.showStartLevelToast(effectsOverlay, toastText, theme, reduce);
     }
 
     private void showCompletedLevelEntryPopup(MainActivity act, GamePrefs prefs, GameTheme theme) {
@@ -291,6 +406,10 @@ public class GameFragment extends Fragment {
 
     private void clearLevelForReplay(MainActivity act, GamePrefs prefs, GameTheme theme, boolean showToast) {
         stopTimer();
+        stopIdleAnimationsImmediately();
+        if (effectsOverlay != null) {
+            effectsOverlay.clearAllEffects();
+        }
         levelFinished = false;
         hintsUsed = 0;
         hintedWordIdx = -1;
@@ -308,6 +427,7 @@ public class GameFragment extends Fragment {
         }
         startTimerIfHardMode(act, prefs, theme, remainingSeconds);
         refreshTopBar(prefs);
+        startLevelEntryAnimations(theme);
         if (showToast) {
             Toast.makeText(requireContext(), "Level reset!", Toast.LENGTH_SHORT).show();
         }
@@ -489,8 +609,10 @@ public class GameFragment extends Fragment {
     }
 
     private void onLevelCompleted(MainActivity act, GamePrefs prefs, GameTheme theme) {
+        if (levelFinished) return;
         levelFinished = true;
         stopTimer();
+        stopIdleAnimationsImmediately();
         act.getSoundManager().playLevelComplete();
 
         boolean alreadyRewarded = prefs.isLevelRewardClaimed(difficulty, category, level);
@@ -505,6 +627,20 @@ public class GameFragment extends Fragment {
         refreshTopBar(prefs);
         act.checkAndNotifyAchievements();
 
+        String ribbonText = (difficulty == Difficulty.DAILY) ? "🌞 DAILY COMPLETE!" : "🎉 LEVEL COMPLETE!";
+        animations.runLevelCompletionSequence(
+                boardContainer,
+                wordScroll,
+                effectsOverlay,
+                ribbonText,
+                theme,
+                isReduceMotion(),
+                () -> showCompletionDialog(act, theme, grantReward, reward)
+        );
+    }
+
+    private void showCompletionDialog(MainActivity act, GameTheme theme, boolean grantReward, int reward) {
+        if (!isAdded()) return;
         String title = (difficulty == Difficulty.DAILY) ? "🌞 Daily Puzzle Complete!" : "🎉 Level Complete!";
         if (grantReward) {
             String message = "Great job! You found all words and earned +" + reward + " ⭐ coins!";
@@ -552,10 +688,10 @@ public class GameFragment extends Fragment {
             }
             if (vibrator != null && vibrator.hasVibrator()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(
-                            WRONG_WORD_VIBRATE_MS, VibrationEffect.DEFAULT_AMPLITUDE));
+                    vibrator.vibrate(VibrationEffect.createWaveform(
+                            GameAnimations.WRONG_WORD_VIBRATE_PATTERN, -1));
                 } else {
-                    vibrator.vibrate(WRONG_WORD_VIBRATE_MS);
+                    vibrator.vibrate(GameAnimations.WRONG_WORD_VIBRATE_PATTERN, -1);
                 }
             }
         } catch (Throwable ignored) {}
@@ -565,9 +701,15 @@ public class GameFragment extends Fragment {
         return hintsUsed;
     }
 
+    public GameAnimations getAnimations() {
+        return animations;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        idleHandler.removeCallbacksAndMessages(null);
+        animations.stopAll(btnHint, effectsOverlay);
         if (prefsRef != null && economyListener != null) {
             prefsRef.removeEconomyChangeListener(economyListener);
         }

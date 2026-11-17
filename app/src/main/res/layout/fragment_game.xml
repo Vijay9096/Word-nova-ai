@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/game_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_default"
-    android:orientation="vertical"
-    android:paddingHorizontal="12dp"
-    android:paddingTop="6dp"
-    android:paddingBottom="8dp">
+    android:background="@color/bg_default">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="8dp">
 
     <!-- Top Bar: Hint Button, Coins Pill, Hard Timer (when visible), Hamburger Menu -->
     <LinearLayout
@@ -193,4 +197,12 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</LinearLayout>
+    </LinearLayout>
+
+    <com.example.ui.EffectsOverlayView
+        android:id="@+id/effects_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
+</FrameLayout>

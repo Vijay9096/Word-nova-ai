@@ -211,7 +211,8 @@ public class WordNovaGameplayFixesTest {
         assertEquals("⭐ " + expectedCoinsAfterFirstClear, coinPill.getText().toString());
         assertTrue(prefs.isLevelCompleted(Difficulty.EASY, Category.GENERAL, 1));
 
-        // Custom popup (GamePopupDialog, NOT AlertDialog) must be shown for completion
+        // Custom popup (GamePopupDialog, NOT AlertDialog) appears after completion celebration sequence
+        ShadowLooper.idleMainLooper(1200, TimeUnit.MILLISECONDS);
         Dialog completionDialog = ShadowDialog.getLatestDialog();
         assertTrue(completionDialog instanceof GamePopupDialog);
         assertFalse(completionDialog instanceof AlertDialog);
@@ -279,6 +280,7 @@ public class WordNovaGameplayFixesTest {
         assertEquals("Only Word Hunter achievement bonus (+20 at 25 words) may be added, never level reward",
                 expectedCoinsAfterFirstClear + 20, prefs.getCoins());
 
+        ShadowLooper.idleMainLooper(1200, TimeUnit.MILLISECONDS);
         Dialog replayDialog = ShadowDialog.getLatestDialog();
         assertTrue(replayDialog instanceof GamePopupDialog);
         Button nextBtn = replayDialog.findViewById(R.id.btn_popup_positive);
