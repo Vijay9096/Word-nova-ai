@@ -33,8 +33,8 @@ public class WordFlowLayout extends ViewGroup {
 
     private void init(Context context) {
         float density = context.getResources().getDisplayMetrics().density;
-        horizontalSpacing = Math.round(6 * density);
-        verticalSpacing = Math.round(6 * density);
+        horizontalSpacing = Math.round(5 * density);
+        verticalSpacing = Math.round(5 * density);
     }
 
     @Override

@@ -45,6 +45,8 @@ public class GamePrefs {
     private static final String KEY_PERFORMANCE = "setting_performance";
     private static final String KEY_MUSIC = "setting_music";
     private static final String KEY_SFX = "setting_sfx";
+    // TODO(TESTING): Temporary key for Unlock All Levels testing feature — remove before production release
+    private static final String KEY_TEST_ALL_LEVELS_UNLOCKED = "testing_all_levels_unlocked";
 
     private static final int DEFAULT_COINS = 100;
     private static final int DEFAULT_HINTS = 2;
@@ -245,8 +247,18 @@ public class GamePrefs {
                 || isLevelCompleted(difficulty, category, level);
     }
 
+    // TODO(TESTING): Temporary testing helpers — remove before production release
+    public boolean isTestingAllLevelsUnlocked() {
+        return prefs.getBoolean(KEY_TEST_ALL_LEVELS_UNLOCKED, false);
+    }
+
+    public void unlockAllLevelsForTesting() {
+        prefs.edit().putBoolean(KEY_TEST_ALL_LEVELS_UNLOCKED, true).apply();
+    }
+
     public boolean isLevelUnlocked(Difficulty difficulty, Category category, int level) {
         if (level <= 1) return true;
+        if (isTestingAllLevelsUnlocked()) return true;
         return isLevelCompleted(difficulty, category, level - 1) || isLevelCompleted(difficulty, category, level);
     }
 
@@ -604,6 +616,7 @@ public class GamePrefs {
         editor.remove(KEY_LEVELS_COMPLETED);
         editor.remove(KEY_HARD_COMPLETED);
         editor.remove(KEY_DAILY_PUZZLE_DATE);
+        editor.remove(KEY_TEST_ALL_LEVELS_UNLOCKED);
         editor.apply();
     }
 

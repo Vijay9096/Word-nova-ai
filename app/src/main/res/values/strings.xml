@@ -5,6 +5,7 @@
     <string name="btn_play">Play</string>
     <string name="btn_clear_storage">Clear Local Storage</string>
     <string name="btn_reset_progress">Reset Progress</string>
+    <string name="btn_unlock_all_levels">Unlock All Levels</string>
     <string name="btn_back">Back</string>
     <string name="btn_close">Close</string>
     <string name="btn_close_menu">Close Menu</string>

@@ -1,8 +1,10 @@
 package com.example;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -13,6 +15,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -57,9 +60,10 @@ public class MainActivity extends AppCompatActivity {
         menuCard = findViewById(R.id.menu_card);
 
         ViewCompat.setOnApplyWindowInsetsListener(rootContainer, (v, windowInsets) -> {
-            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets insets = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
-            return WindowInsetsCompat.CONSUMED;
+            return windowInsets;
         });
 
         setupSideMenu();
@@ -188,10 +192,32 @@ public class MainActivity extends AppCompatActivity {
     public void applyGlobalTheme() {
         GameTheme theme = gamePrefs.getCurrentTheme();
         rootContainer.setBackgroundColor(theme.backgroundColor);
-        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
-                .setAppearanceLightStatusBars(theme.isLightTheme);
-        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
-                .setAppearanceLightNavigationBars(theme.isLightTheme);
+        ensureSystemBarsVisible(theme);
+        ViewCompat.requestApplyInsets(rootContainer);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void ensureSystemBarsVisible(GameTheme theme) {
+        if (getWindow() == null || theme == null) return;
+        View decorView = getWindow().getDecorView();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if (Build.VERSION.SDK_INT < 35) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().clearFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                            | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            getWindow().setStatusBarColor(theme.backgroundColor);
+            int navColor = (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && theme.isLightTheme)
+                    ? Color.parseColor("#1E1E2F")
+                    : theme.backgroundColor;
+            getWindow().setNavigationBarColor(navColor);
+        }
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), decorView);
+        if (controller != null) {
+            controller.show(WindowInsetsCompat.Type.systemBars());
+            controller.setAppearanceLightStatusBars(theme.isLightTheme);
+            controller.setAppearanceLightNavigationBars(theme.isLightTheme);
+        }
     }
 
     public void checkAndNotifyAchievements() {
@@ -214,7 +240,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        ensureSystemBarsVisible(gamePrefs.getCurrentTheme());
         soundManager.onResume();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && gamePrefs != null) {
+            ensureSystemBarsVisible(gamePrefs.getCurrentTheme());
+        }
     }
 
     @Override

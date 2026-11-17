@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/game_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_default"
     android:orientation="vertical"
     android:paddingHorizontal="12dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="12dp">
+    android:paddingTop="6dp"
+    android:paddingBottom="8dp">
 
     <!-- Top Bar: Hint Button, Coins Pill, Hard Timer (when visible), Hamburger Menu -->
     <LinearLayout
@@ -85,81 +86,111 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="6dp"
         android:text="GENERAL - Level 1"
         android:textColor="@color/white"
-        android:textSize="21sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
-    <!-- Scrollable content area so smaller screens never clip word chips or buttons -->
-    <ScrollView
+    <!-- Responsive Play Area: keeps grid, word list, and action buttons tightly grouped and always visible -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/game_content_area"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true"
-        android:scrollbars="none">
+        android:layout_weight="1">
 
-        <LinearLayout
+        <!-- Word Search Grid -->
+        <FrameLayout
+            android:id="@+id/board_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:background="@drawable/bg_board_container"
+            android:padding="4dp"
+            app:layout_constraintBottom_toTopOf="@id/word_scroll"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_chainStyle="packed">
 
-            <!-- 10x10 Board -->
-            <FrameLayout
-                android:id="@+id/board_container"
+            <com.example.ui.WordGridView
+                android:id="@+id/word_grid_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_board_container"
-                android:padding="4dp">
+                android:layout_height="wrap_content" />
+        </FrameLayout>
 
-                <com.example.ui.WordGridView
-                    android:id="@+id/word_grid_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </FrameLayout>
+        <!-- Word List Chips (scrolls only if a dense word list exceeds remaining height) -->
+        <ScrollView
+            android:id="@+id/word_scroll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:overScrollMode="ifContentScrolls"
+            android:scrollbars="none"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@id/bottom_buttons_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/board_container">
 
-            <!-- Word List Chips -->
             <com.example.ui.WordFlowLayout
                 android:id="@+id/word_flow_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp" />
+                android:layout_height="wrap_content" />
+        </ScrollView>
+
+        <!-- Bottom Action Buttons -->
+        <LinearLayout
+            android:id="@+id/bottom_buttons_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/word_scroll">
+
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_blue"
+                android:ellipsize="none"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:minWidth="0dp"
+                android:paddingHorizontal="10dp"
+                android:singleLine="true"
+                android:text="@string/btn_back"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_clear_level"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.6"
+                android:background="@drawable/bg_btn_blue"
+                android:ellipsize="none"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:minWidth="0dp"
+                android:paddingHorizontal="10dp"
+                android:singleLine="true"
+                android:text="@string/btn_clear_level"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </LinearLayout>
-    </ScrollView>
-
-    <!-- Bottom Action Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="20dp">
-
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_btn_blue"
-            android:text="@string/btn_back"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btn_clear_level"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_btn_blue"
-            android:text="@string/btn_clear_level"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

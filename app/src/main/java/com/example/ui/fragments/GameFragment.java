@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.MainActivity;
@@ -108,6 +109,9 @@ public class GameFragment extends Fragment {
         wordFlowLayout = view.findViewById(R.id.word_flow_layout);
         Button btnBack = view.findViewById(R.id.btn_back);
         Button btnClearLevel = view.findViewById(R.id.btn_clear_level);
+        View contentArea = view.findViewById(R.id.game_content_area);
+        View boardContainer = view.findViewById(R.id.board_container);
+        View bottomButtons = view.findViewById(R.id.bottom_buttons_container);
 
         ThemeHelper.styleHeaderText(tvTitle, theme);
         ThemeHelper.styleCard(tvCoinPill, theme.surfaceColor, 12);
@@ -115,6 +119,17 @@ public class GameFragment extends Fragment {
         ThemeHelper.styleCard(tvTimerPill, theme.surfaceColor, 12);
         ThemeHelper.stylePrimaryButton(btnBack, theme);
         ThemeHelper.stylePrimaryButton(btnClearLevel, theme);
+
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                btnBack, 11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                btnClearLevel, 11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+
+        if (contentArea != null && boardContainer != null && bottomButtons != null) {
+            contentArea.addOnLayoutChangeListener((v, left, top, right, bottom,
+                                                   oldLeft, oldTop, oldRight, oldBottom) ->
+                    adjustBoardSizeToFit(contentArea, boardContainer, bottomButtons));
+        }
 
         if (difficulty == Difficulty.DAILY) {
             tvTitle.setText("🌞 Daily Puzzle");
@@ -314,16 +329,53 @@ public class GameFragment extends Fragment {
         );
     }
 
+    private void adjustBoardSizeToFit(View contentArea, View boardContainer, View bottomButtons) {
+        if (!isAdded() || wordFlowLayout == null) return;
+        int availW = contentArea.getWidth();
+        int availH = contentArea.getHeight();
+        if (availW <= 0 || availH <= 0) return;
+
+        wordFlowLayout.measure(
+                View.MeasureSpec.makeMeasureSpec(availW, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+        int wordsH = wordFlowLayout.getMeasuredHeight();
+        int buttonsH = bottomButtons.getHeight();
+        if (buttonsH <= 0) {
+            bottomButtons.measure(
+                    View.MeasureSpec.makeMeasureSpec(availW, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            );
+            buttonsH = bottomButtons.getMeasuredHeight();
+        }
+        int verticalMargins = ThemeHelper.dp(requireContext(), 24);
+        int maxBoardForFit = availH - wordsH - buttonsH - verticalMargins;
+        int minBoardSize = Math.round(availW * 0.72f);
+        int desiredWidth = (maxBoardForFit > 0 && maxBoardForFit < availW)
+                ? Math.max(minBoardSize, maxBoardForFit)
+                : ViewGroup.LayoutParams.MATCH_PARENT;
+
+        ViewGroup.LayoutParams lp = boardContainer.getLayoutParams();
+        if (lp != null && lp.width != desiredWidth) {
+            lp.width = desiredWidth;
+            boardContainer.post(() -> {
+                if (isAdded() && boardContainer.getLayoutParams() != null) {
+                    boardContainer.setLayoutParams(lp);
+                }
+            });
+        }
+    }
+
     private void buildWordChips(GameTheme theme) {
         wordFlowLayout.removeAllViews();
         wordChips.clear();
-        int padH = ThemeHelper.dp(requireContext(), 12);
-        int padV = ThemeHelper.dp(requireContext(), 7);
+        int padH = ThemeHelper.dp(requireContext(), 9);
+        int padV = ThemeHelper.dp(requireContext(), 4);
 
         for (PuzzleGenerator.PlacedWord pw : board.placedWords) {
             TextView chip = new TextView(requireContext());
             chip.setText(pw.word);
-            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
             chip.setTypeface(chip.getTypeface(), android.graphics.Typeface.BOLD);
             chip.setPadding(padH, padV, padH, padV);
             chip.setTextColor(theme.textPrimaryColor);

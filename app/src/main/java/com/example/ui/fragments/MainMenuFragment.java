@@ -44,10 +44,13 @@ public class MainMenuFragment extends Fragment {
         Button btnPlay = view.findViewById(R.id.btn_play);
         Button btnClear = view.findViewById(R.id.btn_clear_storage);
         Button btnReset = view.findViewById(R.id.btn_reset_progress);
+        // TODO(TESTING): Remove Unlock All Levels button handling before production release
+        Button btnUnlockAll = view.findViewById(R.id.btn_unlock_all_levels);
 
         ThemeHelper.stylePrimaryButton(btnPlay, theme);
         ThemeHelper.stylePrimaryButton(btnClear, theme);
         ThemeHelper.stylePrimaryButton(btnReset, theme);
+        ThemeHelper.stylePrimaryButton(btnUnlockAll, theme);
 
         btnPlay.setOnClickListener(v -> {
             act.getSoundManager().playClick();
@@ -80,6 +83,15 @@ public class MainMenuFragment extends Fragment {
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
+        });
+
+        // TODO(TESTING): Remove Unlock All Levels testing action before production release
+        btnUnlockAll.setOnClickListener(v -> {
+            act.getSoundManager().playClick();
+            prefs.unlockAllLevelsForTesting();
+            Toast.makeText(requireContext(),
+                    "Testing Mode: All levels unlocked across all categories!",
+                    Toast.LENGTH_SHORT).show();
         });
     }
 }
