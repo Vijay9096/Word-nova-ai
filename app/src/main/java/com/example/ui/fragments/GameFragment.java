@@ -147,9 +147,9 @@ public class GameFragment extends Fragment {
         ThemeHelper.stylePrimaryButton(btnClearLevel, theme);
 
         TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                btnBack, 11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+                btnBack, 10, 14, 1, TypedValue.COMPLEX_UNIT_SP);
         TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                btnClearLevel, 11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+                btnClearLevel, 10, 14, 1, TypedValue.COMPLEX_UNIT_SP);
 
         if (contentArea != null && boardContainer != null && bottomButtons != null) {
             contentArea.addOnLayoutChangeListener((v, left, top, right, bottom,
@@ -468,7 +468,7 @@ public class GameFragment extends Fragment {
             );
             buttonsH = bottomButtons.getMeasuredHeight();
         }
-        int verticalMargins = ThemeHelper.dp(requireContext(), 24);
+        int verticalMargins = ThemeHelper.dp(requireContext(), 28);
         int maxBoardForFit = availH - wordsH - buttonsH - verticalMargins;
         int minBoardSize = Math.round(availW * 0.72f);
         int desiredWidth = (maxBoardForFit > 0 && maxBoardForFit < availW)

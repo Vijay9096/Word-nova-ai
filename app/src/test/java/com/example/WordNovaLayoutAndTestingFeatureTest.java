@@ -86,6 +86,7 @@ public class WordNovaLayoutAndTestingFeatureTest {
 
             Button btnBack = root.findViewById(R.id.btn_back);
             Button btnClear = root.findViewById(R.id.btn_clear_level);
+            View topBar = root.findViewById(R.id.game_top_bar);
             View boardContainer = root.findViewById(R.id.board_container);
             View wordScroll = root.findViewById(R.id.word_scroll);
             View bottomButtons = root.findViewById(R.id.bottom_buttons_container);
@@ -94,9 +95,10 @@ public class WordNovaLayoutAndTestingFeatureTest {
             assertEquals("Clear This Level", btnClear.getText().toString());
             assertTrue("Back button height >= 48", btnBack.getHeight() >= 48);
             assertTrue("Clear button height >= 48", btnClear.getHeight() >= 48);
+            assertEquals("Buttons must have identical width", btnBack.getWidth(), btnClear.getWidth());
+            assertEquals("Buttons must have identical height", btnBack.getHeight(), btnClear.getHeight());
             assertEquals("Buttons must be horizontally aligned", btnBack.getTop(), btnClear.getTop());
-            assertTrue("Clear button must have wider share than Back button",
-                    btnClear.getWidth() > btnBack.getWidth());
+            assertTrue("Top bar must have comfortable breathing room below status bar", topBar.getTop() >= 18);
 
             // Verify single-line non-clipped rendering
             if (btnClear.getLayout() != null) {
@@ -105,7 +107,7 @@ public class WordNovaLayoutAndTestingFeatureTest {
                         0, btnClear.getLayout().getEllipsisCount(0));
             }
 
-            // Verify tight spacing: board -> word list gap and word list -> buttons gap
+            // Verify balanced compact spacing: board -> word list gap and word list -> buttons gap
             int gridToWordsGap = wordScroll.getTop() - boardContainer.getBottom();
             int wordsToButtonsGap = bottomButtons.getTop() - wordScroll.getBottom();
             assertTrue("Grid-to-words gap must be compact (" + gridToWordsGap + ")",
@@ -113,7 +115,7 @@ public class WordNovaLayoutAndTestingFeatureTest {
             assertTrue("Words-to-buttons gap must be compact (" + wordsToButtonsGap + ")",
                     wordsToButtonsGap >= 0 && wordsToButtonsGap <= 16);
 
-            // Both bottom buttons must remain fully inside the viewport height
+            // Both bottom buttons must remain fully inside the viewport height without overlapping or clipping
             View contentArea = root.findViewById(R.id.game_content_area);
             assertTrue("Bottom buttons must stay visible within content area ("
                             + bottomButtons.getBottom() + " vs " + contentArea.getHeight() + ")",
@@ -121,15 +123,21 @@ public class WordNovaLayoutAndTestingFeatureTest {
             assertTrue("Word chips must be populated", flow.getChildCount() > 0);
         }
 
-        // Also test taller 412x915 phone to ensure no large gap between words and buttons on Daily Puzzle (6 words)
+        // Also test taller 412x915 phone to ensure grid/word list/buttons shift downward evenly without huge internal gaps
         GameFragment daily = GameFragment.newInstance(Difficulty.DAILY, Category.GENERAL, 1);
         activity.navigateTo(daily, true);
         activity.getSupportFragmentManager().executePendingTransactions();
         View dailyRoot = daily.requireView();
         layoutFragmentView(dailyRoot, 412, 915);
+        View dailyBoard = dailyRoot.findViewById(R.id.board_container);
         View dailyScroll = dailyRoot.findViewById(R.id.word_scroll);
         View dailyButtons = dailyRoot.findViewById(R.id.bottom_buttons_container);
+        Button dailyBack = dailyRoot.findViewById(R.id.btn_back);
+        Button dailyClear = dailyRoot.findViewById(R.id.btn_clear_level);
         int dailyGap = dailyButtons.getTop() - dailyScroll.getBottom();
+        assertEquals("Daily Puzzle Back & Clear buttons must match width", dailyBack.getWidth(), dailyClear.getWidth());
+        assertEquals("Daily Puzzle Back & Clear buttons must match height", dailyBack.getHeight(), dailyClear.getHeight());
+        assertTrue("Daily Puzzle grid should sit comfortably downward from title", dailyBoard.getTop() > 0);
         assertTrue("Daily Puzzle must not leave huge gap between words and buttons (" + dailyGap + ")",
                 dailyGap <= 16);
 

@@ -7,15 +7,17 @@
     android:background="@color/bg_default">
 
     <LinearLayout
+        android:id="@+id/game_inner_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="12dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="20dp"
+        android:paddingBottom="12dp">
 
     <!-- Top Bar: Hint Button, Coins Pill, Hard Timer (when visible), Hamburger Menu -->
     <LinearLayout
+        android:id="@+id/game_top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -90,8 +92,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10dp"
         android:text="GENERAL - Level 1"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -115,7 +117,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_bias="0.22"
             app:layout_constraintVertical_chainStyle="packed">
 
             <com.example.ui.WordGridView
@@ -129,7 +131,7 @@
             android:id="@+id/word_scroll"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
             android:overScrollMode="ifContentScrolls"
             android:scrollbars="none"
             app:layout_constrainedHeight="true"
@@ -149,10 +151,10 @@
             android:id="@+id/bottom_buttons_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingHorizontal="6dp"
+            android:paddingHorizontal="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -170,7 +172,7 @@
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:minWidth="0dp"
-                android:paddingHorizontal="10dp"
+                android:paddingHorizontal="6dp"
                 android:singleLine="true"
                 android:text="@string/btn_back"
                 android:textColor="@color/white"
@@ -182,14 +184,14 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="6dp"
-                android:layout_weight="1.6"
+                android:layout_weight="1"
                 android:background="@drawable/bg_btn_blue"
                 android:ellipsize="none"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:minWidth="0dp"
-                android:paddingHorizontal="10dp"
+                android:paddingHorizontal="6dp"
                 android:singleLine="true"
                 android:text="@string/btn_clear_level"
                 android:textColor="@color/white"
