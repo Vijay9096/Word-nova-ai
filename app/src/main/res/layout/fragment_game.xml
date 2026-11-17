@@ -120,7 +120,7 @@
             app:layout_constraintVertical_bias="0.22"
             app:layout_constraintVertical_chainStyle="packed">
 
-            <com.example.ui.WordGridView
+            <com.word.nova.ui.WordGridView
                 android:id="@+id/word_grid_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -140,7 +140,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/board_container">
 
-            <com.example.ui.WordFlowLayout
+            <com.word.nova.ui.WordFlowLayout
                 android:id="@+id/word_flow_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -201,7 +201,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <com.example.ui.EffectsOverlayView
+    <com.word.nova.ui.EffectsOverlayView
         android:id="@+id/effects_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
